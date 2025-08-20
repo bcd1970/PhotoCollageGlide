@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Light Theme Colors -->
+    
+    <!-- Primary Colors -->
+    <color name="primary">#1976D2</color>
+    <color name="primary_variant">#1565C0</color>
+    <color name="primary_dark">#0D47A1</color>
+    <color name="on_primary">#FFFFFF</color>
+    
+    <!-- Surface Colors -->
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F5F5F5</color>
+    <color name="surface_elevated">#FFFFFF</color>
+    <color name="on_surface">#000000</color>
+    <color name="on_surface_variant">#424242</color>
+    
+    <!-- Background Colors -->
+    <color name="background">#FFFFFF</color>
+    <color name="on_background">#000000</color>
+    
+    <!-- Bottom Bar Specific -->
+    <color name="bottom_bar_background">#FFFFFF</color>
+    <color name="bottom_bar_surface">#F8F8F8</color>
+    <color name="bottom_bar_active">#1976D2</color>
+    <color name="bottom_bar_inactive">#757575</color>
+    
+    <!-- Accent Colors -->
+    <color name="accent">#00ACC1</color>
+    <color name="accent_light">#26C6DA</color>
+    <color name="accent_dark">#00838F</color>
+    
+    <!-- Status Colors -->
+    <color name="error">#D32F2F</color>
+    <color name="success">#388E3C</color>
+    <color name="warning">#F57C00</color>
+    
+    <!-- Transparent Overlays -->
+    <color name="transparent">#00000000</color>
+    <color name="overlay_light">#0AFFFFFF</color>
+    <color name="overlay_dark">#1A000000</color>
+    <color name="scrim">#52000000</color>
+    
+    <!-- Ripple Colors -->
+    <color name="ripple_light">#1F000000</color>
+    <color name="ripple_dark">#33FFFFFF</color>
+    <color name="ripple_primary">#331976D2</color>
+</resources>

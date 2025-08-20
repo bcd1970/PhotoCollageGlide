@@ -1,0 +1,54 @@
+# CLAUDE.md files - machine specific
+CLAUDE.md
+**/CLAUDE.md
+
+# Local configuration files
+local.properties
+
+# Gradle files
+.gradle/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android Studio files
+.idea/
+*.iml
+.DS_Store
+
+# Generated files
+bin/
+gen/
+out/
+
+# Log files
+*.log
+
+# Android NDK
+obj/
+
+# Screenshots and temp files
+screenshot*.png
+**/screenshot*.png
+
+# Local keystore files
+*.jks
+*.keystore
+
+# Google Services
+google-services.json
+
+# Fabric plugin
+crashlytics-build.properties
+com_crashlytics_export_strings.xml
+
+# Freeline
+freeline.py
+freeline/
+freeline_project_description.json
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/readme.md
