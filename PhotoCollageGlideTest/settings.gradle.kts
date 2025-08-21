@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "PhotoCollageGlideTest"
 include(":app")
+include(":Material3Showcase")

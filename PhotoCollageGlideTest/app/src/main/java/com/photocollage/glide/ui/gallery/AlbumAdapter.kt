@@ -2,6 +2,7 @@ package com.photocollage.glide.ui.gallery
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -64,6 +65,9 @@ class AlbumAdapter(
                     .placeholder(android.R.color.darker_gray)
                     .into(binding.albumCover)
             }
+            
+            // Set scale type for proper display
+            binding.albumCover.scaleType = ImageView.ScaleType.CENTER_CROP
             
             // Set album info
             binding.albumName.text = album.name

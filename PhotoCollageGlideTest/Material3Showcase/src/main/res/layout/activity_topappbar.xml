@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- App Bar Layout with collapsing behavior -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:fitsSystemWindows="true"
+        app:statusBarForeground="?attr/colorSurface">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:collapsedTitleTextAppearance="?attr/textAppearanceHeadlineSmall"
+            app:expandedTitleTextAppearance="?attr/textAppearanceHeadlineLarge"
+            app:contentScrim="?attr/colorSurface"
+            app:statusBarScrim="?attr/colorSurface"
+            app:expandedTitleMarginStart="24dp"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginBottom="28dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
+
+            <!-- Large background container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="?attr/colorPrimaryContainer"
+                android:padding="24dp"
+                android:gravity="bottom"
+                app:layout_collapseMode="parallax">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Collapsing Toolbars"
+                    android:textAppearance="?attr/textAppearanceHeadlineLarge"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Scroll to see the collapsing animation"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    android:alpha="0.8" />
+
+            </LinearLayout>
+
+            <!-- Toolbar that collapses -->
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:title="Collapsing Toolbars"
+                app:titleTextColor="?attr/colorOnSurface"
+                app:navigationIcon="@drawable/ic_back"
+                app:navigationIconTint="?attr/colorOnSurface"
+                app:layout_collapseMode="pin" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main content with scroll behavior -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Small Top App Bar Demo -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Small Top App Bar"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="?attr/colorSurface"
+                        app:title="Small Title"
+                        app:navigationIcon="@drawable/ic_menu"
+                        app:menu="@menu/top_app_bar_menu" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Medium Top App Bar Demo -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="?attr/colorSecondaryContainer"
+                        app:title="Medium App Bar"
+                        app:titleTextColor="?attr/colorOnSecondaryContainer"
+                        app:navigationIcon="@drawable/ic_menu"
+                        app:navigationIconTint="?attr/colorOnSecondaryContainer" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Medium Top App Bar\nWith Extended Title Area"
+                        android:textAppearance="?attr/textAppearanceHeadlineMedium"
+                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Large Top App Bar Demo -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorTertiaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="?attr/colorTertiaryContainer"
+                        app:navigationIcon="@drawable/ic_menu"
+                        app:navigationIconTint="?attr/colorOnTertiaryContainer" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Large Top App Bar"
+                        android:textAppearance="?attr/textAppearanceHeadlineLarge"
+                        android:textColor="?attr/colorOnTertiaryContainer"
+                        android:padding="24dp"
+                        android:paddingTop="8dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Center-Aligned Top App Bar Demo -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorErrorContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Center-Aligned Top App Bar"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:textColor="?attr/colorOnErrorContainer"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="?attr/colorErrorContainer"
+                        app:title="Centered Title"
+                        app:titleTextColor="?attr/colorOnErrorContainer"
+                        app:titleCentered="true"
+                        app:navigationIcon="@drawable/ic_back"
+                        app:navigationIconTint="?attr/colorOnErrorContainer" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Scroll Behavior Info -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                app:cardCornerRadius="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Scroll Behaviors"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:layout_marginBottom="12dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="• scroll: Content scrolls off screen\n• enterAlways: App bar returns when scrolling up\n• exitUntilCollapsed: Collapses to minimum height\n• snap: Snaps to collapsed or expanded state"
+                        android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Add extra content for scrolling demonstration -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Keep scrolling to see the collapsing effect..."
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:gravity="center"
+                android:padding="32dp"
+                android:textColor="?attr/colorPrimary" />
+
+            <!-- Filler content -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Scroll Content"
+                    android:gravity="center"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="More Content"
+                    android:gravity="center"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

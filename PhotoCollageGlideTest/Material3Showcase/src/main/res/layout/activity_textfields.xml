@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        app:title="Text Fields &amp; Inputs"
+        app:navigationIcon="@drawable/ic_back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/topAppBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Filled Text Fields -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filled Text Fields"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username"
+                style="@style/Widget.Material3.TextInputLayout.FilledBox"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                style="@style/Widget.Material3.TextInputLayout.FilledBox"
+                app:passwordToggleEnabled="true"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Outlined Text Fields -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Outlined Text Fields"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Email Address"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:startIconDrawable="@drawable/ic_email"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phone Number"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:startIconDrawable="@drawable/ic_phone"
+                app:helperText="Include country code"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Dropdown/Spinner -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dropdown Menus"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Country"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_marginBottom="16dp">
+
+                <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:text="United States" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Text Area -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Text Areas"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Message"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                app:counterEnabled="true"
+                app:counterMaxLength="500"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:lines="4"
+                    android:gravity="top" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Chips -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chips"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:selectionRequired="false"
+                app:singleSelection="false">
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Material 3"
+                    style="@style/Widget.Material3.Chip.Assist" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Android"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:checkable="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Design"
+                    style="@style/Widget.Material3.Chip.Input"
+                    app:closeIconVisible="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kotlin"
+                    style="@style/Widget.Material3.Chip.Suggestion" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- Switches and Checkboxes -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Selection Controls"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enable notifications"
+                android:checked="true"
+                android:layout_marginBottom="16dp" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="I agree to the terms and conditions"
+                android:layout_marginBottom="16dp" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Light theme"
+                    android:checked="true" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dark theme" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="System default" />
+
+            </RadioGroup>
+
+            <!-- Sliders -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sliders"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Volume"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="75"
+                android:valueFrom="0"
+                android:valueTo="100"
+                android:stepSize="1"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Price Range"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.slider.RangeSlider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:values="@array/initial_range_slider_values"
+                android:valueFrom="0"
+                android:valueTo="100"
+                android:stepSize="5"
+                android:layout_marginBottom="32dp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

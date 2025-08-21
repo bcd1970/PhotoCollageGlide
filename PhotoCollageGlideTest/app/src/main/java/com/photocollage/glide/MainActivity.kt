@@ -19,7 +19,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.photocollage.glide.databinding.ActivityMainBinding
-import com.photocollage.glide.ui.gallery.PhotoAdapter
+import com.photocollage.glide.ui.gallery.UltraFastPhotoAdapter
 import com.photocollage.glide.ui.gallery.AlbumAdapter
 import com.photocollage.glide.ui.gallery.SpaceItemDecoration
 import com.photocollage.glide.data.MediaRepository
@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
-    private lateinit var photoAdapter: PhotoAdapter
+    private lateinit var photoAdapter: UltraFastPhotoAdapter
     private lateinit var albumAdapter: AlbumAdapter
     private lateinit var mediaRepository: MediaRepository
     
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         
         // Initialize components
         mediaRepository = MediaRepository(this)
-        photoAdapter = PhotoAdapter()
+        photoAdapter = UltraFastPhotoAdapter()
         albumAdapter = AlbumAdapter { album ->
             // Handle album click
             currentAlbum = album
@@ -164,18 +164,18 @@ class MainActivity : AppCompatActivity() {
     
     private fun setupRecyclerView() {
         binding.recyclerView.apply {
-            // Fixed 3 columns grid layout
+            // Fixed 3 columns grid layout with ultra-aggressive prefetching
             layoutManager = GridLayoutManager(this@MainActivity, 3).apply {
-                initialPrefetchItemCount = 6
+                initialPrefetchItemCount = 15 // Ultra-high prefetch for Glide
             }
             
             // Start with photo adapter
             adapter = photoAdapter
             
-            // Performance optimizations
+            // Ultra-aggressive performance optimizations for Glide
             setHasFixedSize(true)
-            setItemViewCacheSize(30)
-            recycledViewPool.setMaxRecycledViews(0, 50)
+            setItemViewCacheSize(100) // Massive cache for Glide
+            recycledViewPool.setMaxRecycledViews(0, 200) // Huge pool
             
             // Disable animations for maximum speed
             itemAnimator = null
@@ -187,10 +187,6 @@ class MainActivity : AppCompatActivity() {
             
             // Improve scrolling performance
             isNestedScrollingEnabled = false
-            
-            // Drawing cache for smoother scrolling
-            isDrawingCacheEnabled = true
-            drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
         }
     }
     
@@ -207,6 +203,10 @@ class MainActivity : AppCompatActivity() {
                     binding.loadingProgress.visibility = View.GONE
                     photoAdapter.submitList(photos)
                     binding.viewTitle.text = "All Photos (${photos.size})"
+                    
+                    // Setup ultra-aggressive Glide preloading AFTER data is loaded
+                    photoAdapter.setupWithRecyclerView(binding.recyclerView)
+                    
                     // Force scroll to top after photos are loaded
                     binding.recyclerView.scrollToPosition(0)
                     (binding.recyclerView.layoutManager as? GridLayoutManager)?.scrollToPositionWithOffset(0, 0)
@@ -252,7 +252,6 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun loadAlbumPhotos(album: AlbumModel) {
-        // Load albums exactly the same way as All Photos
         binding.loadingProgress.visibility = View.VISIBLE
         
         lifecycleScope.launch {
@@ -265,6 +264,10 @@ class MainActivity : AppCompatActivity() {
                     binding.loadingProgress.visibility = View.GONE
                     photoAdapter.submitList(photos)
                     binding.viewTitle.text = "${album.name} (${photos.size})"
+                    
+                    // Setup ultra-aggressive Glide preloading for album photos too
+                    photoAdapter.setupWithRecyclerView(binding.recyclerView)
+                    
                     // Scroll to top to show album photos from beginning
                     binding.recyclerView.scrollToPosition(0)
                 }
@@ -280,8 +283,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    
-    
     
     private fun setupBottomBar() {
         // Navigation button
@@ -315,7 +316,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             // Create new layout manager if needed
             binding.recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 3).apply {
-                initialPrefetchItemCount = 6
+                initialPrefetchItemCount = 15
             }
         }
         

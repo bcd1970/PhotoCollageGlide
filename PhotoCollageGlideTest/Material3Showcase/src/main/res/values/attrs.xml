@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom attributes for faded colors -->
+    <attr name="colorPrimaryFaded" format="color" />
+    <attr name="colorSecondaryFaded" format="color" />
+    <attr name="colorTertiaryFaded" format="color" />
+    <attr name="colorErrorFaded" format="color" />
+    
+    <!-- Custom attributes for faded container colors -->
+    <attr name="colorPrimaryContainerFaded" format="color" />
+    <attr name="colorSecondaryContainerFaded" format="color" />
+    <attr name="colorTertiaryContainerFaded" format="color" />
+    <attr name="colorErrorContainerFaded" format="color" />
+</resources>

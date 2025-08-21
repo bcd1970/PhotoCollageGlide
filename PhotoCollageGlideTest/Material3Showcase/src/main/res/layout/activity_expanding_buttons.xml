@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:title="Expanding Buttons"
+        app:navigationIcon="@drawable/ic_back" />
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Horizontal Expanding Buttons Demo 1 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dot Menu Expansion"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Expanding Dots Container -->
+                    <FrameLayout
+                        android:id="@+id/buttonContainer1"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:clipChildren="false"
+                        android:background="#000000"
+                        android:foreground="@drawable/red_border"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <!-- Square 1 (Purple) - near top border -->
+                        <View
+                            android:id="@+id/square1"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="start|top"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginTop="10dp"
+                            android:background="#9C27B0"
+                            android:elevation="-1dp"
+                            android:visibility="visible"
+                            android:translationY="0dp" />
+
+                        <!-- Square 2 (Red) -->
+                        <View
+                            android:id="@+id/square2"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="start|top"
+                            android:layout_marginStart="100dp"
+                            android:layout_marginTop="10dp"
+                            android:background="#F44336"
+                            android:elevation="-1dp"
+                            android:visibility="visible"
+                            android:translationY="0dp" />
+
+                        <!-- Square 3 (Orange) -->
+                        <View
+                            android:id="@+id/square3"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="start|top"
+                            android:layout_marginStart="180dp"
+                            android:layout_marginTop="10dp"
+                            android:background="#FF9800"
+                            android:elevation="-1dp"
+                            android:visibility="visible"
+                            android:translationY="0dp" />
+
+                        <!-- Square 4 (Blue) -->
+                        <View
+                            android:id="@+id/square4"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="start|top"
+                            android:layout_marginStart="260dp"
+                            android:layout_marginTop="10dp"
+                            android:background="#2196F3"
+                            android:elevation="-1dp"
+                            android:visibility="visible"
+                            android:translationY="0dp" />
+
+                        <!-- Square 5 (Green) -->
+                        <View
+                            android:id="@+id/square5"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="start|top"
+                            android:layout_marginStart="340dp"
+                            android:layout_marginTop="10dp"
+                            android:background="#4CAF50"
+                            android:elevation="-1dp"
+                            android:visibility="visible"
+                            android:translationY="0dp" />
+
+                        <!-- Upper half overlay to hide squares -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:layout_gravity="top"
+                            android:background="#000000"
+                            android:elevation="5dp" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Animation Controls -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Animation Controls"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Movement Speed Control -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Movement Speed"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:layout_marginBottom="4dp" />
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/speedSlider"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:valueFrom="200"
+                            android:valueTo="2000"
+                            android:value="700"
+                            android:stepSize="50" />
+                        
+                        <TextView
+                            android:id="@+id/speedLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="700ms"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:layout_marginStart="12dp"
+                            android:minWidth="60dp" />
+                    </LinearLayout>
+
+                    <!-- Fade Start Position Control -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fade Start Position"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:layout_marginBottom="4dp" />
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/fadeStartSlider"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:valueFrom="0"
+                            android:valueTo="80"
+                            android:value="30"
+                            android:stepSize="5" />
+                        
+                        <TextView
+                            android:id="@+id/fadeStartLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="30%"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:layout_marginStart="12dp"
+                            android:minWidth="60dp" />
+                    </LinearLayout>
+
+                    <!-- Fade Curve Selection -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fade Curve"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/fadeCurveToggleGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true"
+                        app:checkedButton="@+id/easeInButton">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/linearButton"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Linear" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/easeInButton"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Ease-In" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/easeOutButton"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Ease-Out" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/easeInOutButton"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="In-Out" />
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

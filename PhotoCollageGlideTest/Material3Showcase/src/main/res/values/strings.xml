@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Material 3 Showcase</string>
+    
+    <!-- Main Activity -->
+    <string name="title_material3_showcase">Material 3 Showcase</string>
+    <string name="subtitle_showcase">Explore Material You components</string>
+    
+    <!-- Component Categories -->
+    <string name="category_buttons">Buttons &amp; FABs</string>
+    <string name="category_cards">Cards &amp; Surfaces</string>
+    <string name="category_navigation">Navigation</string>
+    <string name="category_topappbar">Top App Bars</string>
+    <string name="category_textfields">Text Fields</string>
+    <string name="category_dialogs">Dialogs &amp; Sheets</string>
+    
+    <!-- Descriptions -->
+    <string name="desc_buttons">Filled, outlined, text buttons and floating action buttons</string>
+    <string name="desc_cards">Elevated, filled and outlined cards with various content</string>
+    <string name="desc_navigation">Navigation bars, rails and drawer components</string>
+    <string name="desc_topappbar">Small, medium, large and center-aligned top app bars</string>
+    <string name="desc_textfields">Filled and outlined text fields with various states</string>
+    <string name="desc_dialogs">Dialogs, bottom sheets and other overlay components</string>
+    
+    <!-- Theme -->
+    <string name="theme_toggle">Toggle Theme</string>
+    <string name="dynamic_colors_toggle">Dynamic Colors</string>
+    
+    <!-- Sample Content -->
+    <string name="sample_title">Sample Title</string>
+    <string name="sample_text">This is sample text to demonstrate Material 3 components and their styling.</string>
+    <string name="sample_long_text">This is a longer sample text to demonstrate how Material 3 components handle multiple lines of text and various content lengths. Material Design 3 provides better readability and accessibility.</string>
+</resources>

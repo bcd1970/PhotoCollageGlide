@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:title="Expandable Components"
+        app:navigationIcon="@drawable/ic_back" />
+
+    <!-- Main Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Exposed Dropdown Menu -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Exposed Dropdown Menus"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Filled Dropdown -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/filledDropdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:hint="Choose an option"
+                        style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu">
+
+                        <AutoCompleteTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Outlined Dropdown -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/outlinedDropdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:hint="Select theme"
+                        app:startIconDrawable="@drawable/ic_color_picker"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+                        <AutoCompleteTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Expandable Cards -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/expandableCard1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:rippleColor="?attr/colorSecondary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Card Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_brightness"
+                            app:tint="?attr/colorOnSecondaryContainer"
+                            android:layout_marginEnd="16dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Photo Adjustments"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                android:textColor="?attr/colorOnSecondaryContainer" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Brightness, contrast, saturation controls"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorOnSecondaryContainer"
+                                android:alpha="0.7" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/expandIcon1"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_expand_more"
+                            app:tint="?attr/colorOnSecondaryContainer" />
+
+                    </LinearLayout>
+
+                    <!-- Expandable Content -->
+                    <LinearLayout
+                        android:id="@+id/expandableContent1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="16dp">
+
+                        <!-- Brightness Slider -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Brightness"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textColor="?attr/colorOnSecondaryContainer" />
+
+                        <com.google.android.material.slider.Slider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:value="50"
+                            android:valueFrom="0"
+                            android:valueTo="100"
+                            android:layout_marginBottom="8dp" />
+
+                        <!-- Contrast Slider -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Contrast"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textColor="?attr/colorOnSecondaryContainer" />
+
+                        <com.google.android.material.slider.Slider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:value="75"
+                            android:valueFrom="0"
+                            android:valueTo="100"
+                            android:layout_marginBottom="8dp" />
+
+                        <!-- Saturation Slider -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Saturation"
+                            android:textAppearance="?attr/textAppearanceLabelMedium"
+                            android:textColor="?attr/colorOnSecondaryContainer" />
+
+                        <com.google.android.material.slider.Slider
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:value="60"
+                            android:valueFrom="0"
+                            android:valueTo="100" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Second Expandable Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/expandableCard2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorTertiaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:rippleColor="?attr/colorTertiary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Card Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_filter"
+                            app:tint="?attr/colorOnTertiaryContainer"
+                            android:layout_marginEnd="16dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Filters &amp; Effects"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                android:textColor="?attr/colorOnTertiaryContainer" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Apply artistic filters and effects"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorOnTertiaryContainer"
+                                android:alpha="0.7" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/expandIcon2"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_expand_more"
+                            app:tint="?attr/colorOnTertiaryContainer" />
+
+                    </LinearLayout>
+
+                    <!-- Expandable Content -->
+                    <LinearLayout
+                        android:id="@+id/expandableContent2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:padding="16dp">
+
+                        <!-- Filter Options -->
+                        <com.google.android.material.chip.ChipGroup
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:singleSelection="true">
+
+                            <com.google.android.material.chip.Chip
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Vintage"
+                                style="@style/Widget.Material3.Chip.Filter" />
+
+                            <com.google.android.material.chip.Chip
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Black &amp; White"
+                                style="@style/Widget.Material3.Chip.Filter" />
+
+                            <com.google.android.material.chip.Chip
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sepia"
+                                style="@style/Widget.Material3.Chip.Filter" />
+
+                            <com.google.android.material.chip.Chip
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Cool"
+                                style="@style/Widget.Material3.Chip.Filter" />
+
+                            <com.google.android.material.chip.Chip
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Warm"
+                                style="@style/Widget.Material3.Chip.Filter" />
+
+                        </com.google.android.material.chip.ChipGroup>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Third Expandable Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/expandableCard3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:rippleColor="?attr/colorPrimary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Card Header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_layers"
+                            app:tint="?attr/colorOnPrimaryContainer"
+                            android:layout_marginEnd="16dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Layer Management"
+                                android:textAppearance="?attr/textAppearanceTitleMedium"
+                                android:textColor="?attr/colorOnPrimaryContainer" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Manage layers and blending modes"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorOnPrimaryContainer"
+                                android:alpha="0.7" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/expandIcon3"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_expand_more"
+                            app:tint="?attr/colorOnPrimaryContainer" />
+
+                    </LinearLayout>
+
+                    <!-- Expandable Content -->
+                    <LinearLayout
+                        android:id="@+id/expandableContent3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:padding="16dp">
+
+                        <!-- Layer Items -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            app:cardBackgroundColor="?attr/colorSurface"
+                            app:cardCornerRadius="8dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="12dp"
+                                android:gravity="center_vertical">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Background Layer"
+                                    android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="100%"
+                                    android:textAppearance="?attr/textAppearanceBodySmall"
+                                    android:layout_marginEnd="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    app:icon="@drawable/ic_visibility"
+                                    style="@style/Widget.Material3.Button.IconButton" />
+
+                            </LinearLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:cardBackgroundColor="?attr/colorSurface"
+                            app:cardCornerRadius="8dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="12dp"
+                                android:gravity="center_vertical">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Overlay Layer"
+                                    android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="75%"
+                                    android:textAppearance="?attr/textAppearanceBodySmall"
+                                    android:layout_marginEnd="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    app:icon="@drawable/ic_visibility"
+                                    style="@style/Widget.Material3.Button.IconButton" />
+
+                            </LinearLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Expandable FAB -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/expandableFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        app:icon="@drawable/ic_add"
+        android:text="Add Layer"
+        app:backgroundTint="?attr/colorPrimary" />
+
+    <!-- Speed Dial FAB Items (Initially hidden) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabOption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="88dp"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_brightness"
+        app:backgroundTint="?attr/colorSecondary"
+        android:visibility="gone" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabOption2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="144dp"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_filter"
+        app:backgroundTint="?attr/colorTertiary"
+        android:visibility="gone" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabOption3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="200dp"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_text_format"
+        app:backgroundTint="?attr/colorError"
+        android:visibility="gone" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

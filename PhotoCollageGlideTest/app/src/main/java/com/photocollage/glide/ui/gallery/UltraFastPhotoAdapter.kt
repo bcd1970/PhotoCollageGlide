@@ -1,5 +1,7 @@
 package com.photocollage.glide.ui.gallery
 
+import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,26 +11,44 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
+import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
+import com.bumptech.glide.util.ViewPreloadSizeProvider
+import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.photocollage.glide.R
 import com.photocollage.glide.data.PhotoModel
 import com.photocollage.glide.databinding.ItemPhotoBinding
 
-class PhotoAdapter : ListAdapter<PhotoModel, PhotoAdapter.PhotoViewHolder>(PhotoDiffCallback()) {
+class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.PhotoViewHolder>(PhotoDiffCallback()), ListPreloader.PreloadModelProvider<PhotoModel> {
     
     private val selectedPhotos = mutableSetOf<Long>()
     var isSelectionMode = false
         private set
     
-    // Glide options for maximum performance
-    private val glideOptions = RequestOptions()
+    private lateinit var context: Context
+    private lateinit var preloadSizeProvider: ViewPreloadSizeProvider<PhotoModel>
+    
+    // Ultra-aggressive options for instant display
+    private val visibleOptions = RequestOptions()
         .centerCrop()
-        .override(200, 200) // Smaller size for faster loading
-        .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache everything for instant display
-        .dontAnimate() // No animations for instant display
-        .encodeQuality(85) // Good quality/size balance
-        .priority(Priority.HIGH) // High priority for visible images
+        .override(200, 200)
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+        .dontAnimate()
+        .priority(Priority.IMMEDIATE) // Highest priority for visible items
+        .skipMemoryCache(false)
+        .placeholder(ColorDrawable(0xFF424242.toInt())) // Solid gray
+        .error(ColorDrawable(0xFF424242.toInt()))
+    
+    // Thumbnail options for ultra-fast preloading
+    private val thumbnailOptions = RequestOptions()
+        .centerCrop()
+        .override(50, 50) // Tiny thumbnails for instant preload
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+        .dontAnimate()
+        .priority(Priority.LOW)
+        .skipMemoryCache(false)
+        .format(com.bumptech.glide.load.DecodeFormat.PREFER_RGB_565)
     
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         context = parent.context
@@ -62,45 +82,84 @@ class PhotoAdapter : ListAdapter<PhotoModel, PhotoAdapter.PhotoViewHolder>(Photo
         return currentList.filter { selectedPhotos.contains(it.id) }
     }
     
-    fun getScrollListener(): RecyclerView.OnScrollListener {
+    fun setupWithRecyclerView(recyclerView: RecyclerView) {
+        // Setup ultra-aggressive preloading with Glide's RecyclerView integration
+        preloadSizeProvider = ViewPreloadSizeProvider<PhotoModel>()
+        
+        val preloader = RecyclerViewPreloader(
+            Glide.with(recyclerView),
+            this,
+            preloadSizeProvider,
+            75 // Preload 75 items ahead for ultra-smooth scrolling!
+        )
+        
+        recyclerView.addOnScrollListener(preloader)
+        recyclerView.addOnScrollListener(getUltraAggressiveScrollListener())
+    }
+    
+    private fun getUltraAggressiveScrollListener(): RecyclerView.OnScrollListener {
         return object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                // Don't pause loading - let Glide handle it for instant images
-                // Pausing was causing grey squares
-            }
-            
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                // Preload images in the direction of scroll
                 val layoutManager = recyclerView.layoutManager as? GridLayoutManager ?: return
                 val lastVisible = layoutManager.findLastVisibleItemPosition()
                 val firstVisible = layoutManager.findFirstVisibleItemPosition()
                 
-                // Preload next items based on scroll direction
+                // Ultra-aggressive bidirectional preloading - 100 images ahead!
                 if (dy > 0) { // Scrolling down
-                    for (i in lastVisible..minOf(lastVisible + 15, itemCount - 1)) {
-                        preloadImage(i)
+                    for (i in lastVisible..minOf(lastVisible + 100, itemCount - 1)) {
+                        preloadThumbnail(i)
                     }
                 } else if (dy < 0) { // Scrolling up
-                    for (i in maxOf(0, firstVisible - 15)..firstVisible) {
-                        preloadImage(i)
+                    for (i in maxOf(0, firstVisible - 100)..firstVisible) {
+                        preloadThumbnail(i)
                     }
+                }
+                
+                // Preload full-size images for closer items (30 ahead)
+                for (i in lastVisible..minOf(lastVisible + 30, itemCount - 1)) {
+                    if (i >= 0) preloadFullImage(i)
+                }
+                for (i in maxOf(0, firstVisible - 30)..firstVisible) {
+                    preloadFullImage(i)
                 }
             }
         }
     }
     
-    private fun preloadImage(position: Int) {
+    private fun preloadThumbnail(position: Int) {
         if (position in 0 until itemCount) {
             val photo = getItem(position)
-            // Simple preloading with Glide
             Glide.with(context)
                 .load(photo.uri)
-                .apply(glideOptions)
+                .apply(thumbnailOptions)
+                .preload(50, 50) // Tiny thumbnails
+        }
+    }
+    
+    private fun preloadFullImage(position: Int) {
+        if (position in 0 until itemCount) {
+            val photo = getItem(position)
+            Glide.with(context)
+                .load(photo.uri)
+                .apply(visibleOptions.priority(Priority.LOW))
                 .preload(200, 200)
         }
     }
     
-    private lateinit var context: android.content.Context
+    // Implement PreloadModelProvider for Glide's RecyclerView integration
+    override fun getPreloadItems(position: Int): List<PhotoModel> {
+        return if (position >= 0 && position < itemCount) {
+            listOf(getItem(position))
+        } else {
+            emptyList()
+        }
+    }
+    
+    override fun getPreloadRequestBuilder(photo: PhotoModel): com.bumptech.glide.RequestBuilder<*> {
+        return Glide.with(context)
+            .load(photo.uri)
+            .apply(thumbnailOptions)
+    }
     
     inner class PhotoViewHolder(
         val binding: ItemPhotoBinding
@@ -125,14 +184,26 @@ class PhotoAdapter : ListAdapter<PhotoModel, PhotoAdapter.PhotoViewHolder>(Photo
                     toggleSelection(photo.id, position)
                 }
             }
+            
+            // Tell preload size provider about our fixed size
+            if (::preloadSizeProvider.isInitialized) {
+                preloadSizeProvider.setView(binding.imageView)
+            }
         }
         
         fun bind(photo: PhotoModel) {
-            // Simple Glide loading - let Glide handle everything
+            // Set solid background first to prevent flash
+            binding.imageView.setBackgroundColor(0xFF424242.toInt())
+            
+            // Load with thumbnail-first approach for ultra-smooth loading
             Glide.with(binding.imageView.context)
                 .load(photo.uri)
-                .apply(glideOptions)
-                .placeholder(R.color.surface_variant)
+                .apply(visibleOptions)
+                .thumbnail(
+                    Glide.with(binding.imageView.context)
+                        .load(photo.uri)
+                        .apply(thumbnailOptions)
+                )
                 .into(binding.imageView)
             
             // Update selection UI
