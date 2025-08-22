@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew:*)",
+      "Bash(export PATH=$PATH:/c/Users/cozmita/AppData/Local/Android/Sdk/platform-tools)",
+      "Bash(adb:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

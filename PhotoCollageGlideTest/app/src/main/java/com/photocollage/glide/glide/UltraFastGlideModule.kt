@@ -17,44 +17,35 @@ import com.bumptech.glide.request.RequestOptions
 class UltraFastGlideModule : AppGlideModule() {
     
     override fun applyOptions(context: Context, builder: GlideBuilder) {
-        // Ultra-aggressive memory cache - 250MB for zero loading delays
-        val memoryCacheSizeBytes = 1024L * 1024L * 250L // 250MB
-        builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes))
+        // Use device-appropriate memory sizing (Samsung Gallery approach)
+        val calculator = com.bumptech.glide.load.engine.cache.MemorySizeCalculator.Builder(context)
+            .setMemoryCacheScreens(3.0f) // Cache 3 screens worth of images
+            .setBitmapPoolScreens(4.0f) // Pool for 4 screens of bitmaps
+            .build()
         
-        // Massive bitmap pool for instant recycling - 200MB
-        val bitmapPoolSizeBytes = 1024L * 1024L * 200L // 200MB
-        builder.setBitmapPool(LruBitmapPool(bitmapPoolSizeBytes))
+        builder.setMemoryCache(LruResourceCache(calculator.memoryCacheSize.toLong()))
+        builder.setBitmapPool(LruBitmapPool(calculator.bitmapPoolSize.toLong()))
         
-        // Enormous disk cache - 1GB for storing all images
-        val diskCacheSizeBytes = 1024L * 1024L * 1024L // 1GB
+        // Reasonable disk cache - 500MB
+        val diskCacheSizeBytes = 1024L * 1024L * 500L // 500MB
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes))
         
-        // Maximum thread count for parallel processing
+        // Optimal thread count for photo gallery
         builder.setSourceExecutor(GlideExecutor.newSourceBuilder()
-            .setThreadCount(8) // Max threads for loading
-            .setName("ultra-source")
+            .setThreadCount(4) // Optimal for image loading
+            .setName("photo-source")
             .build())
             
         builder.setDiskCacheExecutor(GlideExecutor.newDiskCacheBuilder()
-            .setThreadCount(6) // Max threads for disk cache
-            .setName("ultra-disk")
+            .setThreadCount(2) // Background disk operations
+            .setName("photo-disk")
             .build())
         
-        // Ultra-fast default options
-        val defaultOptions = RequestOptions()
-            .format(DecodeFormat.PREFER_RGB_565) // 50% memory reduction, faster decode
-            .disallowHardwareConfig() // More predictable performance
-            .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache everything
-            .override(200, 200) // Fixed size = no resize calculations
-            .encodeFormat(Bitmap.CompressFormat.JPEG)
-            .encodeQuality(75) // Smaller files, faster loading
-            .dontAnimate() // No animations = instant display
-            .skipMemoryCache(false) // Always use memory cache
+        // NO default options - let each RequestOptions configure individually
+        // This prevents conflicts with single photo full-resolution loading
         
-        builder.setDefaultRequestOptions(defaultOptions)
-        
-        // Minimal logging for max performance
-        builder.setLogLevel(android.util.Log.ERROR)
+        // Debug logging for development
+        builder.setLogLevel(android.util.Log.DEBUG)
     }
     
     override fun isManifestParsingEnabled(): Boolean = false

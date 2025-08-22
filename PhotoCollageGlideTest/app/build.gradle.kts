@@ -62,6 +62,12 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.recyclerview:recyclerview-selection:1.1.0")
     
+    // ViewPager2 for single photo view
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+    
+    // SubsamplingScaleImageView for large photos (Samsung Gallery style)
+    implementation("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
+    
     // Core Android
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")

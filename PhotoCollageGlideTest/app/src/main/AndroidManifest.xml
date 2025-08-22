@@ -30,6 +30,20 @@
             </intent-filter>
         </activity>
         
+        <!-- Photo Edit Activity -->
+        <activity
+            android:name="com.photocollage.glide.ui.edit.PhotoEditActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.PhotoCollageGlide" />
+        
+        <!-- Collage Edit Activity -->
+        <activity
+            android:name="com.photocollage.glide.ui.edit.CollageEditActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.PhotoCollageGlide" />
+        
     </application>
 
 </manifest>

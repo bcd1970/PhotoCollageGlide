@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shadow background for depth -->
+    <item android:top="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#08000000" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+    
+    <!-- Main translucent background with subtle gradient -->
+    <item android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#30FFFFFF"
+                android:centerColor="#40FFFFFF"
+                android:endColor="#30FFFFFF"
+                android:angle="0" />
+            <corners android:radius="12dp" />
+            <stroke 
+                android:width="0.5dp" 
+                android:color="#15FFFFFF" />
+        </shape>
+    </item>
+    
+    <!-- Glass morphism highlight effect -->
+    <item 
+        android:bottom="2dp"
+        android:top="1dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#25FFFFFF"
+                android:centerColor="#10FFFFFF"
+                android:endColor="#05FFFFFF"
+                android:angle="90" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</layer-list>

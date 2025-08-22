@@ -227,6 +227,11 @@ class MediaRepository(private val context: Context) {
     }
     
     
+    // Synchronous method to get cached album photos instantly
+    fun getCachedAlbumPhotos(bucketId: String): List<PhotoModel>? {
+        return cachedPhotos?.filter { it.bucketId == bucketId }
+    }
+    
     fun clearCache() {
         cachedPhotos = null
     }
