@@ -44,8 +44,8 @@ class UltraFastGlideModule : AppGlideModule() {
         // NO default options - let each RequestOptions configure individually
         // This prevents conflicts with single photo full-resolution loading
         
-        // Debug logging for development
-        builder.setLogLevel(android.util.Log.DEBUG)
+        // Production log level - only errors
+        builder.setLogLevel(android.util.Log.ERROR)
     }
     
     override fun isManifestParsingEnabled(): Boolean = false

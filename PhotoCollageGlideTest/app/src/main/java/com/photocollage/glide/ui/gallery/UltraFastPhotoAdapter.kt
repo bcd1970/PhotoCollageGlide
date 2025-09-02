@@ -2,7 +2,9 @@ package com.photocollage.glide.ui.gallery
 
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.view.LayoutInflater
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -12,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.integration.recyclerview.RecyclerViewPreloader
-import com.bumptech.glide.util.ViewPreloadSizeProvider
+import com.bumptech.glide.util.FixedPreloadSizeProvider
 import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -22,6 +24,10 @@ import com.photocollage.glide.databinding.ItemPhotoBinding
 import com.photocollage.glide.selection.SelectionManager
 
 class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.PhotoViewHolder>(PhotoDiffCallback()), ListPreloader.PreloadModelProvider<PhotoModel> {
+
+    init {
+        setHasStableIds(true)
+    }
     
     private val selectionManager = SelectionManager.getInstance()
     
@@ -38,15 +44,18 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
     private var currentContext: NavigationContext = NavigationContext.ALL_PHOTOS
     
     private lateinit var context: Context
-    private var preloadSizeProvider: ViewPreloadSizeProvider<PhotoModel>? = null
+    private var preloadSizeProvider: ListPreloader.PreloadSizeProvider<PhotoModel>? = null
     private var currentRecyclerView: RecyclerView? = null
     private var currentPreloader: RecyclerViewPreloader<PhotoModel>? = null
     private var currentScrollListener: RecyclerView.OnScrollListener? = null
+
+    // Computed size for grid items to let Glide decode to exact size
+    private var targetWidthPx: Int = 200
+    private var targetHeightPx: Int = 200
     
     // Ultra-aggressive options for instant display
     private val visibleOptions = RequestOptions()
         .centerCrop()
-        .override(200, 200)
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .dontAnimate()
         .priority(Priority.IMMEDIATE) // Highest priority for visible items
@@ -57,7 +66,6 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
     // Thumbnail options for ultra-fast preloading
     private val thumbnailOptions = RequestOptions()
         .centerCrop()
-        .override(50, 50) // Tiny thumbnails for instant preload
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .dontAnimate()
         .priority(Priority.LOW)
@@ -72,6 +80,10 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
             false
         )
         return PhotoViewHolder(binding)
+    }
+
+    override fun getItemId(position: Int): Long {
+        return getItem(position).id
     }
     
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
@@ -94,11 +106,11 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
     }
     
     // Get optimized preload counts based on navigation context
-    private fun getPreloadCounts(): Triple<Int, Int, Int> {
+    private fun getPreloadCounts(): Int {
         return when (currentContext) {
-            NavigationContext.ALL_PHOTOS -> Triple(50, 50, 20) // RecyclerViewPreloader, thumbnail, full
-            NavigationContext.ALBUM_PHOTOS -> Triple(30, 30, 15) // Reduced for album context
-            NavigationContext.SWITCHING_CONTEXT -> Triple(40, 40, 18) // Maintain aggressive preloading during transitions
+            NavigationContext.ALL_PHOTOS -> 12 // Moderate, avoids jank
+            NavigationContext.ALBUM_PHOTOS -> 10
+            NavigationContext.SWITCHING_CONTEXT -> 12
         }
     }
     
@@ -110,81 +122,45 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
         currentRecyclerView = recyclerView
         context = recyclerView.context
         
-        // Setup context-aware preloading with Glide's RecyclerView integration
-        preloadSizeProvider = ViewPreloadSizeProvider<PhotoModel>()
-        
-        val (recyclerViewPreloadCount, _, _) = getPreloadCounts()
-        
+        // Compute exact target size based on grid layout
+        computeAndSetTargetSize(recyclerView)
+
+        // Setup context-aware preloading with a fixed size provider
+        preloadSizeProvider = FixedPreloadSizeProvider<PhotoModel>(targetWidthPx, targetHeightPx)
+
+        val recyclerViewPreloadCount = getPreloadCounts()
+
         val preloader = RecyclerViewPreloader(
             Glide.with(recyclerView),
             this,
             preloadSizeProvider!!,
             recyclerViewPreloadCount
         )
-        
-        val scrollListener = getOptimizedScrollListener()
-        
+
         // Store references for cleanup
         currentPreloader = preloader
-        currentScrollListener = scrollListener
-        
+
         // Double-check no duplicate listeners before adding
         recyclerView.removeOnScrollListener(preloader)
-        recyclerView.removeOnScrollListener(scrollListener)
-        
+
         recyclerView.addOnScrollListener(preloader)
-        recyclerView.addOnScrollListener(scrollListener)
     }
-    
-    private fun getOptimizedScrollListener(): RecyclerView.OnScrollListener {
-        return object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as? GridLayoutManager ?: return
-                val lastVisible = layoutManager.findLastVisibleItemPosition()
-                val firstVisible = layoutManager.findFirstVisibleItemPosition()
-                
-                val (_, thumbnailCount, fullImageCount) = getPreloadCounts()
-                
-                // Context-aware bidirectional preloading
-                if (dy > 0) { // Scrolling down
-                    for (i in lastVisible..minOf(lastVisible + thumbnailCount, itemCount - 1)) {
-                        preloadThumbnail(i)
-                    }
-                } else if (dy < 0) { // Scrolling up
-                    for (i in maxOf(0, firstVisible - thumbnailCount)..firstVisible) {
-                        preloadThumbnail(i)
-                    }
-                }
-                
-                // Preload full-size images for closer items (context-aware count)
-                for (i in lastVisible..minOf(lastVisible + fullImageCount, itemCount - 1)) {
-                    if (i >= 0) preloadFullImage(i)
-                }
-                for (i in maxOf(0, firstVisible - fullImageCount)..firstVisible) {
-                    preloadFullImage(i)
-                }
-            }
-        }
-    }
-    
-    private fun preloadThumbnail(position: Int) {
-        if (position in 0 until itemCount) {
-            val photo = getItem(position)
-            Glide.with(context)
-                .load(photo.uri)
-                .apply(thumbnailOptions)
-                .preload(50, 50) // Tiny thumbnails
-        }
-    }
-    
-    private fun preloadFullImage(position: Int) {
-        if (position in 0 until itemCount) {
-            val photo = getItem(position)
-            Glide.with(context)
-                .load(photo.uri)
-                .apply(visibleOptions.priority(Priority.LOW))
-                .preload(200, 200)
-        }
+
+    private fun computeAndSetTargetSize(recyclerView: RecyclerView) {
+        val lm = recyclerView.layoutManager as? GridLayoutManager
+        val spanCount = lm?.spanCount ?: 3
+        val metrics = recyclerView.resources.displayMetrics
+        val totalWidth = recyclerView.width.takeIf { it > 0 } ?: metrics.widthPixels
+        val spacingPx = 1 // matches SpaceItemDecoration(1)
+        val totalSpacing = spacingPx * (spanCount + 1)
+        val columnWidth = ((totalWidth - totalSpacing) / spanCount).coerceAtLeast(1)
+        val heightDp = 120
+        val heightPx = (heightDp * metrics.density).toInt()
+
+        targetWidthPx = columnWidth
+        targetHeightPx = heightPx
+
+        // FixedPreloadSizeProvider already uses these values
     }
     
     // Implement PreloadModelProvider for Glide's RecyclerView integration
@@ -199,7 +175,7 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
     override fun getPreloadRequestBuilder(photo: PhotoModel): com.bumptech.glide.RequestBuilder<*> {
         return Glide.with(context)
             .load(photo.uri)
-            .apply(thumbnailOptions)
+            .apply(thumbnailOptions.override(targetWidthPx, targetHeightPx))
     }
     
     // Clean up existing listeners and references
@@ -208,9 +184,9 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
             currentPreloader?.let { preloader ->
                 recyclerView.removeOnScrollListener(preloader)
             }
-            currentScrollListener?.let { scrollListener ->
-                recyclerView.removeOnScrollListener(scrollListener)
-            }
+        currentScrollListener?.let { scrollListener ->
+            recyclerView.removeOnScrollListener(scrollListener)
+        }
         }
         
         // Clear references
@@ -251,6 +227,14 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
                     val photo = getItem(position)
                     // Always allow selection on tap
                     selectionManager.togglePhotoSelection(photo)
+                    // Stronger haptic feedback for selection in grid (closer to single-view long press)
+                    val hapticType = if (Build.VERSION.SDK_INT >= 30) {
+                        // Use crisp confirm on newer devices when available
+                        HapticFeedbackConstants.CONFIRM
+                    } else {
+                        HapticFeedbackConstants.LONG_PRESS
+                    }
+                    binding.root.performHapticFeedback(hapticType)
                     // Notify position tracking for view transitions
                     onPhotoClick?.invoke(position, photo)
                     // Update this item's UI
@@ -258,8 +242,6 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
                 }
             }
             
-            // Tell preload size provider about our fixed size
-            preloadSizeProvider?.setView(binding.imageView)
         }
         
         fun bind(photo: PhotoModel) {
@@ -269,12 +251,9 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
             // Load with thumbnail-first approach for ultra-smooth loading
             Glide.with(binding.imageView.context)
                 .load(photo.uri)
-                .apply(visibleOptions)
-                .thumbnail(
-                    Glide.with(binding.imageView.context)
-                        .load(photo.uri)
-                        .apply(thumbnailOptions)
-                )
+                .apply(visibleOptions.override(targetWidthPx, targetHeightPx))
+                // Use fraction-based thumbnail to avoid duplicate loads
+                .thumbnail(0.25f)
                 .into(binding.imageView)
             
             // Update selection UI
@@ -283,12 +262,10 @@ class UltraFastPhotoAdapter : ListAdapter<PhotoModel, UltraFastPhotoAdapter.Phot
         
         fun updateSelectionUI(photoId: Long) {
             val isSelected = selectionManager.isPhotoSelected(photoId)
-            val hasAnySelection = selectionManager.hasSelection()
             
-            // Show checkbox when there are any selections
-            binding.checkbox.visibility = if (hasAnySelection) View.VISIBLE else View.GONE
-            binding.checkbox.isChecked = isSelected
+            // Show both selection overlay and hacked border when photo is selected
             binding.selectionOverlay.visibility = if (isSelected) View.VISIBLE else View.GONE
+            binding.hackedBorder.visibility = if (isSelected) View.VISIBLE else View.GONE
         }
     }
     

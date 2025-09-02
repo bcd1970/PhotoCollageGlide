@@ -5,12 +5,10 @@
     android:background="?attr/colorSurface">
 
     <!-- Full-screen image view with zoom support -->
-    <ImageView
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/singlePhotoImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
         android:background="?attr/colorSurface" />
 
     <!-- Selection overlay - only visible when selected -->

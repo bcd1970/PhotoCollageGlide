@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Gallery Glide Test</string>
+    <string name="albums_label_default">Albums</string>
 </resources>

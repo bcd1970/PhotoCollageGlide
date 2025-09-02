@@ -4,9 +4,37 @@
       "Bash(./gradlew:*)",
       "Bash(export PATH=$PATH:/c/Users/cozmita/AppData/Local/Android/Sdk/platform-tools)",
       "Bash(adb:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "WebSearch",
+      "Bash(sed:*)",
+      "Bash(jobs)",
+      "Bash(timeout 60 adb logcat:*)",
+      "Bash(timeout 5 adb logcat:*)",
+      "Bash(timeout 10 adb logcat:*)",
+      "Bash(grep:*)",
+      "Bash(/bashes)",
+      "Bash(pkill:*)",
+      "Bash(kill:*)",
+      "Bash(timeout 3 adb logcat:*)",
+      "Bash(timeout 3 adb shell dumpsys activity:*)",
+      "Bash(timeout 15 adb logcat)",
+      "Bash(/c/Users/cozmita/AppData/Local/Android/Sdk/platform-tools/adb devices)",
+      "Bash(/c/Users/cozmita/AppData/Local/Android/Sdk/platform-tools/adb logcat -c)",
+      "Bash(/c/Users/cozmita/AppData/Local/Android/Sdk/platform-tools/adb logcat -s ViewportDebug CollageNavigation ViewportBounds)",
+      "Read(/C:\\Users\\cozmita\\.claude/**)",
+      "Bash(git checkout:*)",
+      "Bash(timeout:*)",
+      "Bash(taskkill:*)",
+      "Bash(find:*)",
+      "Bash(powershell:*)",
+      "Bash(claude --debug)",
+      "Bash(python:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "C:\\Apps"
+    ]
   }
 }

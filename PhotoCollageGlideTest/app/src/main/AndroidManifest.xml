@@ -30,16 +30,9 @@
             </intent-filter>
         </activity>
         
-        <!-- Photo Edit Activity -->
+        <!-- Unified Edit Activity (handles both single photo and collage) -->
         <activity
-            android:name="com.photocollage.glide.ui.edit.PhotoEditActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:theme="@style/Theme.PhotoCollageGlide" />
-        
-        <!-- Collage Edit Activity -->
-        <activity
-            android:name="com.photocollage.glide.ui.edit.CollageEditActivity"
+            android:name="com.photocollage.glide.ui.edit.UnifiedEditActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/Theme.PhotoCollageGlide" />

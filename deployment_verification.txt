@@ -1,0 +1,32 @@
+--------- beginning of system
+08-25 15:53:52.698  3345  4368 D DeviceStorageMonitorService: Available File Node Number is [11582459]
+08-25 15:53:52.698  3345  4368 W DeviceStorageMonitorService: updateBroadcasts_filenode(/data) fn_oldLevel:0, fn_newLevel:0, seq:1
+--------- beginning of main
+08-25 15:53:52.963  1768  5934 I vendor.qti.bluetooth@1.0-ibs_handler: ProcessIbsCmd: Received IBS_WAKE_IND: 0xFD
+08-25 15:53:52.963  1768  5934 D vendor.qti.bluetooth@1.0-ibs_handler: SerialClockVote: vote for UART CLK ON
+08-25 15:53:52.963  1768  5934 D vendor.qti.bluetooth@1.0-wake_lock: Acquire wakelock is acquired 
+08-25 15:53:52.963  1768  5934 I vendor.qti.bluetooth@1.0-ibs_handler: ProcessIbsCmd: Writing IBS_WAKE_ACK
+08-25 15:53:52.971  4820  5947 I BtGatt.ScanHelper: onScanResult to scannerId: 2- eventType=0x10, addressType=1, address=XX:XX:XX:XX:21:E1, primaryPhy=1, secondaryPhy=0, advertisingSid=0xff, txPower=127, rssi=-87, periodicAdvInt=0x0
+08-25 15:53:53.014  1768  5934 I vendor.qti.bluetooth@1.0-ibs_handler: ProcessIbsCmd: Received IBS_SLEEP_IND: 0xFE
+08-25 15:53:53.014  1768  5934 D vendor.qti.bluetooth@1.0-ibs_handler: SerialClockVote: vote for UART CLK OFF
+08-25 15:53:53.164  1768  4946 D vendor.qti.bluetooth@1.0-wake_lock: Release wakelock is released 
+08-25 15:53:53.385  1773 19341 I sensors-hal: handle_sns_std_sensor_event:411, [SSC_LIGHT] P: 401(401),c:45,b:86,m:13,cl:11,l:401,s:305,l0:67840,l1:224,s0:50000,s1:0,acl:1,opr:0.36,f(r):88,u(bl):100,if:0,wi:0,si:0,0(N:0)
+08-25 15:53:53.492  2262  2262 I CNSS    : /sys/wifi/max_chipset_log_size doesn't exist
+08-25 15:53:54.185  1773  6305 I sensors-hal: handle_sns_std_sensor_event:132, [SSC_LIGHT] A: 399(399),c:45,b:86,m:13,cl:11,l:399,s:305,l0:67552,l1:224,s0:50000,s1:0,acl:1,opr:0.36,f(r):88,u(bl):100,if:0,wi:0,si:0,0(N:0)
+08-25 15:53:54.240  1183  1183 D io_stats: !@ Read_top(KB): ding:background(14160) 16
+08-25 15:53:54.240  1183  1183 D io_stats: !@ Write_top(KB): kworker/u17:1(17727) 1832
+08-25 15:53:54.317  3345 21990 I AfterimageCompensationService: AfcThread mLuminance : 122 , AfpcPeriodCount : 1986 , rotation : 0 , AOD : false
+08-25 15:53:54.320  1815 13199 I SnapAlloc: Using graphics libs for alignment calculations
+08-25 15:53:54.323  1945  2194 D RenderEngine: [SEC_SF_EFFECTS] drawLayersInternal,1299, Rendering layer  at index 0
+08-25 15:53:54.323  1945  2194 D RenderEngine: [SEC_SF_EFFECTS] drawLayersInternal,1299, Rendering layer com.photocollage.glide.test/com.photocollage.glide.ui.edit.UnifiedEditActivity$_21398#77379 at index 1
+08-25 15:53:54.324  1945  2194 D RenderEngine: [SEC_SF_EFFECTS] drawLayersInternal,1299, Rendering layer StatusBar$_4572#91 at index 2
+08-25 15:53:54.324  1945  2194 D RenderEngine: [SEC_SF_EFFECTS] drawLayersInternal,1299, Rendering layer NavigationBar0$_4572#88 at index 3
+08-25 15:53:54.337  3345 21990 D system_server: mAFPC_Read - w = 1080, h = 2340, s = 8, f = 4, s_size = 10183680, luminance = 122, count = 1986, captureOrientation = 0
+08-25 15:53:54.765  3345  8317 D SemWifiUsabilityStatsMonitor: onWifiUsabilityStats - seqNum 52015, isSameBssidAndFreq true
+08-25 15:53:54.771  1945  2167 I VSyncReactor: Current= 120, Period= 120, Distance= 0
+08-25 15:53:54.780  1945  2167 I VSyncReactor: Current= 120, Period= 120, Distance= 120
+08-25 15:53:54.782  3345  4459 D SGM:GameManager: identifyGamePackage. com.photocollage.glide.test, mCurrentUserId: 0, callerUserId: 0, callingMethodInfo: com.samsung.android.game.SemGameManager.isGamePackage(SemGameManager.java:105)
+08-25 15:53:54.783  3345  4459 D SGM:SemGameManager: isGamePackage(), pkgName=com.photocollage.glide.test, ret=false
+08-25 15:53:54.785  1826  2888 I SDM     : AIScalerFeatureIntfImpl::LookupConfig: Scale ratio = 1.780000
+08-25 15:53:54.785  1826  2888 I SDM     : AIScalerParserIntfImpl::LookupConfig: Scale Ratio Match Found Here
+08-25 15:53:54.856  1826  2118 I SDM     : DisplayBase::CommitThread: Received idle timeout, panel: cmd, timeout: 69999 us

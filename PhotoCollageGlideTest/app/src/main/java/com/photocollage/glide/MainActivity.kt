@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -33,8 +34,7 @@ import com.photocollage.glide.data.MediaRepository
 import com.photocollage.glide.data.AlbumModel
 import com.photocollage.glide.data.PhotoModel
 import com.photocollage.glide.selection.SelectionManager
-import com.photocollage.glide.ui.edit.PhotoEditActivity
-import com.photocollage.glide.ui.edit.CollageEditActivity
+import com.photocollage.glide.ui.edit.UnifiedEditActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,9 +68,22 @@ class MainActivity : AppCompatActivity() {
     private var currentAlbum: AlbumModel? = null
     private var currentPhotos: List<PhotoModel> = emptyList()
     
-    // Separate position tracking for different contexts
+    // Separate position tracking for different contexts (single photo pager)
     private var allPhotosPosition = 0
     private var albumPhotosPosition = 0
+
+    // Grid scroll state preservation (position + offset)
+    private var allPhotosGridPos = 0
+    private var allPhotosGridOffset = 0
+    private var albumPhotosGridPos = 0
+    private var albumPhotosGridOffset = 0
+    private var albumsGridPos = 0
+    private var albumsGridOffset = 0
+
+    // Pending scroll restore request after data loads
+    private var pendingScrollPos: Int? = null
+    private var pendingScrollOffset: Int = 0
+    
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -152,6 +165,8 @@ class MainActivity : AppCompatActivity() {
         
         // Setup UI interactions
         setupBottomNavigation()
+        // Ensure bottom navigation labels can wrap and show album name when needed
+        updateAlbumsMenuTitle(null)
         setupSinglePhotoViewPager()
         setupThemeSwitcher()
         setupSelectedPhotosStrip()
@@ -176,10 +191,11 @@ class MainActivity : AppCompatActivity() {
     
     
     private fun setupRecyclerView() {
+        // Photos grid
         binding.recyclerView.apply {
-            // Fixed 3 columns grid layout with ultra-aggressive prefetching
+            // Fixed 3 columns grid layout with balanced prefetching
             layoutManager = GridLayoutManager(this@MainActivity, 3).apply {
-                initialPrefetchItemCount = 15 // Ultra-high prefetch for Glide
+                initialPrefetchItemCount = 9
             }
             
             // Start with photo adapter
@@ -187,8 +203,8 @@ class MainActivity : AppCompatActivity() {
             
             // Ultra-aggressive performance optimizations for Glide
             setHasFixedSize(true)
-            setItemViewCacheSize(100) // Massive cache for Glide
-            recycledViewPool.setMaxRecycledViews(0, 200) // Huge pool
+            setItemViewCacheSize(30)
+            recycledViewPool.setMaxRecycledViews(0, 60)
             
             // Disable animations for maximum speed
             itemAnimator = null
@@ -201,7 +217,40 @@ class MainActivity : AppCompatActivity() {
             // Improve scrolling performance
             isNestedScrollingEnabled = false
         }
+        // Single RecyclerView is used for both photos and albums
     }
+
+    private fun saveCurrentGridScroll() {
+        val lm = binding.recyclerView.layoutManager as? GridLayoutManager ?: return
+        val pos = lm.findFirstVisibleItemPosition()
+        val firstView = binding.recyclerView.getChildAt(0)
+        val offset = firstView?.top ?: 0
+        when (currentState) {
+            NavigationState.ALL_PHOTOS -> { allPhotosGridPos = pos; allPhotosGridOffset = offset }
+            NavigationState.ALBUM_PHOTOS -> { albumPhotosGridPos = pos; albumPhotosGridOffset = offset }
+            NavigationState.ALBUMS -> { albumsGridPos = pos; albumsGridOffset = offset }
+        }
+    }
+
+    private fun requestRestoreGridScrollFor(state: NavigationState) {
+        when (state) {
+            NavigationState.ALL_PHOTOS -> { pendingScrollPos = allPhotosGridPos; pendingScrollOffset = allPhotosGridOffset }
+            NavigationState.ALBUM_PHOTOS -> { pendingScrollPos = albumPhotosGridPos; pendingScrollOffset = albumPhotosGridOffset }
+            NavigationState.ALBUMS -> { pendingScrollPos = albumsGridPos; pendingScrollOffset = albumsGridOffset }
+        }
+    }
+
+    private fun applyPendingScrollIfAny() {
+        val pos = pendingScrollPos ?: return
+        val lm = binding.recyclerView.layoutManager as? GridLayoutManager ?: return
+        binding.recyclerView.post {
+            lm.scrollToPositionWithOffset(pos, pendingScrollOffset)
+        }
+        pendingScrollPos = null
+        pendingScrollOffset = 0
+    }
+
+    // Removed transition overlay logic for simplicity
     
     private fun loadAllPhotos() {
         binding.loadingProgress.visibility = View.VISIBLE
@@ -219,14 +268,9 @@ class MainActivity : AppCompatActivity() {
                     // Stop any ongoing scroll first
                     binding.recyclerView.stopScroll()
                     
-                    // Submit data and wait for layout
+                    // Submit data and restore scroll if requested
                     photoAdapter.submitList(photos) {
-                        // This callback runs after the list is updated
-                        binding.recyclerView.post {
-                            // Force scroll to top after data is fully loaded
-                            binding.recyclerView.scrollToPosition(0)
-                            (binding.recyclerView.layoutManager as? GridLayoutManager)?.scrollToPositionWithOffset(0, 0)
-                        }
+                        applyPendingScrollIfAny()
                     }
                     
                     binding.viewTitle.text = "All Photos (${photos.size})"
@@ -259,7 +303,9 @@ class MainActivity : AppCompatActivity() {
                 
                 withContext(Dispatchers.Main) {
                     binding.loadingProgress.visibility = View.GONE
-                    albumAdapter.submitList(albums)
+                    albumAdapter.submitList(albums) {
+                        applyPendingScrollIfAny()
+                    }
                     binding.viewTitle.text = "Albums (${albums.size})"
                 }
             } catch (e: Exception) {
@@ -292,14 +338,9 @@ class MainActivity : AppCompatActivity() {
                     // Stop any ongoing scroll first
                     binding.recyclerView.stopScroll()
                     
-                    // Submit data and wait for layout
+                    // Submit data and restore scroll if requested
                     photoAdapter.submitList(photos) {
-                        // This callback runs after the list is updated
-                        binding.recyclerView.post {
-                            // Force scroll to top after data is fully loaded
-                            binding.recyclerView.scrollToPosition(0)
-                            (binding.recyclerView.layoutManager as? GridLayoutManager)?.scrollToPositionWithOffset(0, 0)
-                        }
+                        applyPendingScrollIfAny()
                     }
                     
                     binding.viewTitle.text = "${album.name} (${photos.size})"
@@ -371,7 +412,6 @@ class MainActivity : AppCompatActivity() {
                     ViewPager2.SCROLL_STATE_SETTLING -> "SETTLING"
                     else -> "UNKNOWN"
                 }
-                Log.d("MainActivity", "ViewPager2 scroll state: $stateStr")
             }
 
             override fun onPageSelected(position: Int) {
@@ -381,7 +421,10 @@ class MainActivity : AppCompatActivity() {
                     NavigationState.ALBUM_PHOTOS -> albumPhotosPosition
                     NavigationState.ALBUMS -> 0
                 }
-                Log.d("MainActivity", "ViewPager2 page selected: $position (was: $oldPosition)")
+                // Reset zoom on the page we just left
+                val internalRv = try { binding.singlePhotoViewPager.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView } catch (_: Throwable) { null }
+                val oldVh = internalRv?.findViewHolderForAdapterPosition(oldPosition) as? com.photocollage.glide.ui.gallery.SinglePhotoAdapter.SinglePhotoViewHolder
+                oldVh?.resetZoomToFit()
                 
                 // Update the correct position variable based on current state
                 when (currentState) {
@@ -469,6 +512,8 @@ class MainActivity : AppCompatActivity() {
     
     
     private fun navigateToAllPhotos() {
+        // Save current scroll from previous state
+        saveCurrentGridScroll()
         // Prepare adapter for context transition with smart cache management
         // Don't clear cache when transitioning from album to all photos to preserve performance
         val shouldClearCache = false
@@ -480,14 +525,25 @@ class MainActivity : AppCompatActivity() {
         currentState = NavigationState.ALL_PHOTOS
         currentAlbum = null
         currentViewMode = ViewMode.GRID
-        allPhotosPosition = 0 // Reset all photos position when navigating to all photos
+        // Restore previous grid scroll position when returning to all photos
+        requestRestoreGridScrollFor(NavigationState.ALL_PHOTOS)
         
         // Show grid view, hide single photo view
         binding.recyclerView.visibility = View.VISIBLE
         binding.singlePhotoViewPager.visibility = View.GONE
-        
-        // Stop any ongoing scroll immediately
-        binding.recyclerView.stopScroll()
+
+        // Ensure photos grid config
+        val lmAll = binding.recyclerView.layoutManager as? GridLayoutManager
+        if (lmAll != null) {
+            lmAll.spanCount = 3
+        } else {
+            binding.recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 3).apply {
+                initialPrefetchItemCount = 9
+            }
+        }
+
+        // Set adapter to photos
+        binding.recyclerView.adapter = photoAdapter
         
         // Set 3 columns for photos
         val layoutManager = binding.recyclerView.layoutManager as? GridLayoutManager
@@ -496,14 +552,14 @@ class MainActivity : AppCompatActivity() {
         } else {
             // Create new layout manager if needed
             binding.recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 3).apply {
-                initialPrefetchItemCount = 15
+                initialPrefetchItemCount = 9
             }
         }
         
-        // Set the adapter
-        binding.recyclerView.adapter = photoAdapter
-        
-        // Load all photos - this will handle scrolling to top after data loads
+        // Reset Albums label title when returning to all photos
+        updateAlbumsMenuTitle(null)
+
+        // Load all photos and restore previous scroll when ready
         loadAllPhotos()
         
         // Update navigation visibility
@@ -511,6 +567,8 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun navigateToAlbums() {
+        // Save current scroll before switching
+        saveCurrentGridScroll()
         currentState = NavigationState.ALBUMS
         currentAlbum = null
         currentViewMode = ViewMode.ALBUMS
@@ -518,13 +576,26 @@ class MainActivity : AppCompatActivity() {
         // Show grid view, hide single photo view
         binding.recyclerView.visibility = View.VISIBLE
         binding.singlePhotoViewPager.visibility = View.GONE
-        
-        // Set 2 columns for albums (they need more space)
-        (binding.recyclerView.layoutManager as GridLayoutManager).spanCount = 2
-        
-        // Update UI
+
+        // Configure grid for albums (2 columns)
+        val lmAlbums = binding.recyclerView.layoutManager as? GridLayoutManager
+        if (lmAlbums != null) {
+            lmAlbums.spanCount = 2
+        } else {
+            binding.recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 2).apply {
+                initialPrefetchItemCount = 8
+            }
+        }
+
+        // Switch adapter to albums
         binding.recyclerView.adapter = albumAdapter
         
+        // Reset Albums label title
+        updateAlbumsMenuTitle(null)
+
+        // Request restore of previous albums scroll
+        requestRestoreGridScrollFor(NavigationState.ALBUMS)
+
         // Load albums and cache all photos for instant album viewing
         loadAlbums()
         
@@ -542,6 +613,9 @@ class MainActivity : AppCompatActivity() {
     
     
     private fun navigateToAlbumPhotos(album: AlbumModel) {
+        // Save current scroll before switching
+        saveCurrentGridScroll()
+
         // Prepare adapter for context transition
         val shouldClearCache = (currentState == NavigationState.ALL_PHOTOS)
         photoAdapter.prepareForContextTransition(
@@ -552,32 +626,36 @@ class MainActivity : AppCompatActivity() {
         currentState = NavigationState.ALBUM_PHOTOS
         currentViewMode = ViewMode.GRID
         currentAlbum = album
-        albumPhotosPosition = 0 // Reset album photos position when navigating to new album
+        // Restore previous album grid scroll if available
+        requestRestoreGridScrollFor(NavigationState.ALBUM_PHOTOS)
         
         // Show grid view, hide single photo view
         binding.recyclerView.visibility = View.VISIBLE
         binding.singlePhotoViewPager.visibility = View.GONE
         
-        // Stop any ongoing scroll
-        binding.recyclerView.stopScroll()
-        
-        // Set 3 columns for photos
-        (binding.recyclerView.layoutManager as GridLayoutManager).spanCount = 3
-        
-        // Update UI
+        // Configure grid for photos (3 columns)
+        val lmPhotos = binding.recyclerView.layoutManager as? GridLayoutManager
+        if (lmPhotos != null) {
+            lmPhotos.spanCount = 3
+        } else {
+            binding.recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 3).apply {
+                initialPrefetchItemCount = 9
+            }
+        }
+
+        // Ensure photo adapter is set
         binding.recyclerView.adapter = photoAdapter
+        
+        // Update Albums item label to include album name under the icon
+        updateAlbumsMenuTitle(album.name)
         
         // Try to load from cache first for instant display
         val cachedPhotos = mediaRepository.getCachedAlbumPhotos(album.id)
         if (cachedPhotos != null && cachedPhotos.isNotEmpty()) {
             // Instant loading from cache
             currentPhotos = cachedPhotos
-            albumPhotosPosition = 0 // Reset position for cached album photos
             photoAdapter.submitList(cachedPhotos) {
-                binding.recyclerView.post {
-                    binding.recyclerView.scrollToPosition(0)
-                    (binding.recyclerView.layoutManager as? GridLayoutManager)?.scrollToPositionWithOffset(0, 0)
-                }
+                applyPendingScrollIfAny()
             }
             binding.viewTitle.text = "${album.name} (${cachedPhotos.size})"
             photoAdapter.setupWithRecyclerView(binding.recyclerView)
@@ -588,6 +666,53 @@ class MainActivity : AppCompatActivity() {
         
         // Update navigation visibility
         updateBottomNavigationVisibility()
+    }
+
+    private fun updateAlbumsMenuTitle(albumName: String?) {
+        val maxAlbumLen = 28
+        val safeName = albumName?.trim()?.take(maxAlbumLen)
+        val title = if (safeName.isNullOrEmpty()) {
+            getString(R.string.albums_label_default)
+        } else {
+            safeName
+        }
+        val item = binding.bottomNavigation.menu.findItem(R.id.nav_albums)
+        item.title = title
+
+        // Allow label to span two lines when album name is long
+        makeBottomNavigationLabelsMultiline()
+    }
+
+    private fun makeBottomNavigationLabelsMultiline() {
+        val menuView = binding.bottomNavigation.getChildAt(0) as? android.view.ViewGroup ?: return
+        val largeIds = intArrayOf(
+            com.google.android.material.R.id.navigation_bar_item_large_label_view
+        )
+        val smallIds = intArrayOf(
+            com.google.android.material.R.id.navigation_bar_item_small_label_view
+        )
+        for (i in 0 until menuView.childCount) {
+            val itemView = menuView.getChildAt(i)
+            for (id in largeIds) {
+                val tv = itemView.findViewById<TextView?>(id)
+                tv?.let {
+                    it.isSingleLine = false
+                    it.maxLines = 2
+                    it.ellipsize = android.text.TextUtils.TruncateAt.END
+                    it.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                }
+            }
+            for (id in smallIds) {
+                val tv = itemView.findViewById<TextView?>(id)
+                tv?.let {
+                    it.isSingleLine = false
+                    it.maxLines = 2
+                    it.ellipsize = android.text.TextUtils.TruncateAt.END
+                    it.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                }
+            }
+        }
+        menuView.requestLayout()
     }
     
     private fun hasMediaPermission(): Boolean {
@@ -679,10 +804,10 @@ class MainActivity : AppCompatActivity() {
             
             when (selectionManager.selectionMode.value) {
                 SelectionManager.SelectionMode.EDIT -> {
-                    startActivity(PhotoEditActivity.newIntent(this, photoIds))
+                    startActivity(UnifiedEditActivity.newIntent(this, photoIds))
                 }
                 SelectionManager.SelectionMode.COLLAGE -> {
-                    startActivity(CollageEditActivity.newIntent(this, photoIds))
+                    startActivity(UnifiedEditActivity.newIntent(this, photoIds))
                 }
                 SelectionManager.SelectionMode.NONE -> {
                     // Should not happen when FAB is visible

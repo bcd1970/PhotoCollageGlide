@@ -21,14 +21,13 @@
         android:background="#4D000000"
         android:visibility="gone" />
 
-    <!-- Checkbox for selection - top right corner -->
-    <CheckBox
-        android:id="@+id/checkbox"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="4dp"
-        android:visibility="gone"
-        android:buttonTint="@android:color/white" />
+    <!-- Hacked selection border effect -->
+    <View
+        android:id="@+id/hackedBorder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/hacked_selection_border"
+        android:visibility="gone" />
+
 
 </FrameLayout>

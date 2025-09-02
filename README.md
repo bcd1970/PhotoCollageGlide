@@ -35,6 +35,8 @@ PhotoCollageGlide/
 - **Smart Selection UI**: Elegant translucent thumbnail strip with gradient transparency
 - **Edit/Collage Modes**: Floating action button toggles based on selection count
 - **Selection Persistence**: Selection state maintained across all navigation contexts
+- **Corner Navigation Overlay**: Smart 80dp thumbnail overlay for single photo mode with zoom-based visibility
+- **Professional Photo Editor**: Pinch-to-zoom, pan, momentum scrolling with viewport indicators
 - **Instant Loading**: No grey squares or loading delays
 - **Smooth Performance**: 60 FPS scrolling maintained with 0-1ms bind times
 
@@ -80,6 +82,9 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 - `SinglePhotoAdapter.kt` - Full-screen view with selection capability  
 - `SelectionManager.kt` - Persistent selection state management
 - `SelectedPhotosAdapter.kt` - Translucent thumbnail strip
+- `UnifiedEditActivity.kt` - Unified photo and collage editor with navigation overlays
+- `PhotoNavigationOverlay.kt` - Corner navigation overlay for single photo mode
+- `UnifiedPhotoEditorView.kt` - Professional photo editor with zoom-based overlay control
 - `UltraFastGlideModule.kt` - Optimized Glide configuration
 - `MediaRepository.kt` - Direct MediaStore access
 
@@ -115,13 +120,17 @@ The gallery now performs identically to professional apps like **Google Photos**
 - Zero flicker
 - Minimal memory usage
 
-## 📝 Recently Implemented (v2.0)
+## 📝 Recently Implemented (v3.3)
 - ✅ **Universal Photo Selection** - Works in grid AND single photo views
 - ✅ **Elegant UI Design** - Translucent gradient thumbnail strip with glass morphism
 - ✅ **Edit/Collage Modes** - Smart floating action button with context switching
 - ✅ **Selection Persistence** - State maintained across all navigation contexts
 - ✅ **Performance Optimized** - 0-1ms bind times with payload-based updates
 - ✅ **Real-time Sync** - Kotlin Flow for reactive UI updates
+- ✅ **Corner Navigation Overlay** - Smart thumbnail navigation for single photo mode (80dp, zoom-based visibility)
+- ✅ **Professional Photo Editor** - Pinch-to-zoom, pan, momentum scrolling with OverScroller
+- ✅ **Collage Navigation System** - Horizontal thumbnail strip with real-time viewport indicators
+- ✅ **Smooth Fade Animations** - 500ms fade-in/250ms fade-out for thumbnail overlay with manual alpha control
 
 ## 📝 Next Steps for Production
 1. Implement photo editing features in placeholder activities

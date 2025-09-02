@@ -1,0 +1,455 @@
+package com.photocollage.glide.ui.edit
+
+import android.content.Context
+import android.graphics.*
+import android.net.Uri
+import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DecodeFormat
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import kotlin.math.max
+import kotlin.math.min
+
+/**
+ * Thumbnail navigation overlay for collage view showing miniature representation
+ * with viewport position indicator and touch navigation support.
+ * 
+ * Performance targets:
+ * - Rendering: 60fps (16ms frame time)
+ * - Memory usage: <10MB for thumbnails
+ * - Touch response: <16ms
+ */
+class CollageNavigationOverlay @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr) {
+    
+    companion object {
+        private const val OVERLAY_HEIGHT_DP = 64f // Height of the overlay in dp (increased for visibility)  
+        private const val THUMBNAIL_MAX_HEIGHT = 48f // Max thumbnail height in dp (increased)
+        private const val VIEWPORT_INDICATOR_STROKE_WIDTH = 2f
+        private const val OVERLAY_PADDING_DP = 8f
+        private const val CORNER_RADIUS_DP = 4f
+        
+        // Colors  
+        private const val OVERLAY_BACKGROUND_COLOR = 0xCC000000.toInt() // More opaque black for visibility
+        private const val VIEWPORT_INDICATOR_COLOR = 0xFF00FF00.toInt() // Bright green
+        private const val THUMBNAIL_BORDER_COLOR = 0x40FFFFFF.toInt() // Semi-transparent white
+    }
+    
+    // Dimensions in pixels (converted from dp)
+    private val overlayHeight: Float
+    private val thumbnailMaxHeight: Float
+    private val overlayPadding: Float
+    private val cornerRadius: Float
+    
+    // Paint objects for rendering
+    private val overlayBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = OVERLAY_BACKGROUND_COLOR
+        style = Paint.Style.FILL
+    }
+    
+    private val viewportIndicatorPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = VIEWPORT_INDICATOR_COLOR
+        style = Paint.Style.STROKE
+        strokeWidth = VIEWPORT_INDICATOR_STROKE_WIDTH
+    }
+    
+    private val thumbnailBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = THUMBNAIL_BORDER_COLOR
+        style = Paint.Style.STROKE
+        strokeWidth = 1f
+    }
+    
+    private val imagePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    
+    // Thumbnail data
+    private val photoUris = mutableListOf<Uri>()
+    private val thumbnailBitmaps = mutableListOf<Bitmap?>()
+    private val thumbnailPositions = mutableListOf<RectF>()
+    private var currentTargets = mutableListOf<CustomTarget<Bitmap>?>()
+    
+    // Collage dimensions for scaling calculations
+    private var collageWidth = 0f
+    private var collageHeight = 0f
+    private var thumbnailScale = 1f
+    
+    // Viewport tracking
+    private var viewportBounds = RectF()
+    private var isViewportVisible = false
+    
+    // Touch handling
+    private var onNavigationClickListener: ((Float, Float) -> Unit)? = null
+    
+    // Reusable objects for performance
+    private val tempRectF = RectF()
+    private val sourceRectF = RectF() // For bitmap source bounds
+    private val tempPath = Path()
+    
+    // Glide options for thumbnails - optimized for small images
+    private val thumbnailOptions = RequestOptions()
+        .centerCrop()
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+        .dontAnimate()
+        .skipMemoryCache(false) // Cache thumbnails for better performance
+        .format(DecodeFormat.PREFER_RGB_565)
+        .override(64, 64) // Small thumbnail size for performance
+    
+    init {
+        val density = context.resources.displayMetrics.density
+        overlayHeight = OVERLAY_HEIGHT_DP * density
+        thumbnailMaxHeight = THUMBNAIL_MAX_HEIGHT * density
+        overlayPadding = OVERLAY_PADDING_DP * density
+        cornerRadius = CORNER_RADIUS_DP * density
+        
+        // Enable hardware acceleration
+        setLayerType(LAYER_TYPE_HARDWARE, null)
+        
+        // Ensure visibility
+        visibility = VISIBLE
+        
+        // Debug logging
+        android.util.Log.d("CollageNavigationOverlay", "Overlay initialized with height: ${overlayHeight}")
+    }
+    
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = overlayHeight.toInt()
+        setMeasuredDimension(width, height)
+    }
+    
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w > 0 && h > 0 && thumbnailBitmaps.isNotEmpty()) {
+            calculateThumbnailLayout()
+        }
+    }
+    
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        
+        // Always draw background for visibility, even if no thumbnails
+        tempRectF.set(0f, 0f, width.toFloat(), height.toFloat())
+        canvas.drawRoundRect(tempRectF, cornerRadius, cornerRadius, overlayBackgroundPaint)
+        
+        val loadedThumbnails = thumbnailBitmaps.count { it != null }
+        android.util.Log.d("CollageNavigationOverlay", "onDraw: ${loadedThumbnails}/${thumbnailBitmaps.size} thumbnails loaded, positions: ${thumbnailPositions.size}")
+        
+        if (thumbnailBitmaps.isEmpty() || loadedThumbnails == 0) {
+            // Draw placeholder text when no thumbnails
+            overlayBackgroundPaint.color = 0xFFFFFFFF.toInt()
+            overlayBackgroundPaint.textSize = 16f
+            canvas.drawText("Loading thumbnails...", 20f, height/2f, overlayBackgroundPaint)
+            overlayBackgroundPaint.color = OVERLAY_BACKGROUND_COLOR // Reset color
+            return
+        }
+        
+        // Draw thumbnail images
+        drawThumbnails(canvas)
+        
+        // Draw viewport indicator if visible
+        if (isViewportVisible) {
+            drawViewportIndicator(canvas)
+        }
+    }
+    
+    /**
+     * Set photos for thumbnail generation
+     */
+    fun setPhotos(uris: List<Uri>, totalCollageWidth: Float, totalCollageHeight: Float) {
+        android.util.Log.d("CollageNavigationOverlay", "setPhotos called with ${uris.size} URIs, dimensions: ${totalCollageWidth}x${totalCollageHeight}")
+        if (uris.isEmpty()) return
+        
+        // Clear existing data
+        clearThumbnails()
+        
+        photoUris.addAll(uris)
+        collageWidth = totalCollageWidth
+        collageHeight = totalCollageHeight
+        
+        // Initialize target list
+        currentTargets = MutableList(uris.size) { null }
+        
+        android.util.Log.d("CollageNavigationOverlay", "Starting thumbnail loading for ${uris.size} photos")
+        // Load thumbnails
+        uris.forEachIndexed { index, uri ->
+            loadThumbnailAtIndex(uri, index)
+        }
+        
+        // Force initial invalidation to show "Loading..." text
+        invalidate()
+    }
+    
+    /**
+     * Update viewport bounds for indicator
+     */
+    fun updateViewport(viewportBounds: RectF, isVisible: Boolean) {
+        this.viewportBounds.set(viewportBounds)
+        this.isViewportVisible = isVisible
+        invalidate()
+    }
+    
+    /**
+     * Set navigation click listener
+     */
+    fun setOnNavigationClickListener(listener: (Float, Float) -> Unit) {
+        this.onNavigationClickListener = listener
+    }
+    
+    /**
+     * Load thumbnail at specific index
+     */
+    private fun loadThumbnailAtIndex(uri: Uri, index: Int) {
+        android.util.Log.d("CollageNavigationOverlay", "Loading thumbnail $index from URI: $uri")
+        
+        // Clear previous target if exists
+        currentTargets.getOrNull(index)?.let { target ->
+            try {
+                Glide.with(context.applicationContext).clear(target)
+            } catch (e: Exception) {
+                android.util.Log.e("CollageNavigationOverlay", "Error clearing target $index", e)
+            }
+        }
+        
+        // Create new target and store reference
+        val target = object : CustomTarget<Bitmap>() {
+            override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                android.util.Log.d("CollageNavigationOverlay", "Thumbnail $index loaded: ${resource.width}x${resource.height}")
+                if (index < currentTargets.size) {
+                    // Extend lists if necessary
+                    while (thumbnailBitmaps.size <= index) {
+                        thumbnailBitmaps.add(null) // Initialize with null first
+                        thumbnailPositions.add(RectF())
+                    }
+                    
+                    thumbnailBitmaps[index] = resource
+                    
+                    // Check if all thumbnails are loaded
+                    checkAllThumbnailsLoaded()
+                }
+            }
+            
+            override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {
+                android.util.Log.d("CollageNavigationOverlay", "Thumbnail $index cleared")
+                if (index < thumbnailBitmaps.size) {
+                    thumbnailBitmaps[index] = null
+                }
+                invalidate()
+            }
+            
+            override fun onLoadFailed(errorDrawable: android.graphics.drawable.Drawable?) {
+                android.util.Log.e("CollageNavigationOverlay", "Failed to load thumbnail $index")
+                // Still check if others are loaded
+                checkAllThumbnailsLoaded()
+            }
+        }
+        
+        currentTargets[index] = target
+        
+        // Load thumbnail
+        try {
+            android.util.Log.d("CollageNavigationOverlay", "Starting Glide load for thumbnail $index")
+            Glide.with(context.applicationContext)
+                .asBitmap()
+                .load(uri)
+                .apply(thumbnailOptions)
+                .into(target)
+        } catch (e: Exception) {
+            android.util.Log.e("CollageNavigationOverlay", "Error starting Glide load for thumbnail $index", e)
+        }
+    }
+    
+    /**
+     * Check if all thumbnails are loaded and calculate layout
+     */
+    private fun checkAllThumbnailsLoaded() {
+        val loadedCount = thumbnailBitmaps.count { it != null }
+        val totalCount = photoUris.size
+        android.util.Log.d("CollageNavigationOverlay", "Thumbnails loaded: $loadedCount/$totalCount, width: $width")
+        
+        if (loadedCount == totalCount && width > 0) {
+            android.util.Log.d("CollageNavigationOverlay", "All thumbnails loaded, calculating layout")
+            calculateThumbnailLayout()
+            invalidate()
+        }
+    }
+    
+    /**
+     * Calculate thumbnail layout within overlay
+     */
+    private fun calculateThumbnailLayout() {
+        android.util.Log.d("CollageNavigationOverlay", "calculateThumbnailLayout: bitmaps=${thumbnailBitmaps.size}, collageSize=${collageWidth}x${collageHeight}, overlaySize=${width}x${height}")
+        
+        if (thumbnailBitmaps.isEmpty() || collageWidth <= 0 || collageHeight <= 0) {
+            android.util.Log.w("CollageNavigationOverlay", "Cannot calculate layout: invalid dimensions")
+            return
+        }
+        
+        // Calculate scale to fit thumbnails within overlay height
+        val availableHeight = height - (2 * overlayPadding)
+        thumbnailScale = min(thumbnailMaxHeight / collageHeight, availableHeight / collageHeight)
+        
+        val scaledCollageHeight = collageHeight * thumbnailScale
+        val scaledCollageWidth = collageWidth * thumbnailScale
+        
+        android.util.Log.d("CollageNavigationOverlay", "Thumbnail scale: $thumbnailScale, scaled collage: ${scaledCollageWidth}x${scaledCollageHeight}")
+        
+        // Center thumbnails horizontally in overlay
+        val startX = (width - scaledCollageWidth) / 2f
+        val startY = (height - scaledCollageHeight) / 2f
+        
+        android.util.Log.d("CollageNavigationOverlay", "Thumbnail area start: ($startX, $startY)")
+        
+        // Calculate individual thumbnail positions
+        thumbnailPositions.clear()
+        var currentX = startX
+        
+        thumbnailBitmaps.forEachIndexed { index, bitmap ->
+            bitmap?.let {
+                // Calculate scaled dimensions maintaining aspect ratio
+                val aspectRatio = it.width.toFloat() / it.height.toFloat()
+                val scaledWidth = scaledCollageHeight * aspectRatio
+                
+                val position = RectF(
+                    currentX,
+                    startY,
+                    currentX + scaledWidth,
+                    startY + scaledCollageHeight
+                )
+                
+                android.util.Log.d("CollageNavigationOverlay", "Thumbnail $index position: $position")
+                thumbnailPositions.add(position)
+                
+                currentX += scaledWidth
+            }
+        }
+        
+        android.util.Log.d("CollageNavigationOverlay", "Layout calculation complete, ${thumbnailPositions.size} positions calculated")
+    }
+    
+    /**
+     * Draw thumbnail images
+     */
+    private fun drawThumbnails(canvas: Canvas) {
+        thumbnailBitmaps.forEachIndexed { index, bitmap ->
+            bitmap?.let {
+                if (index < thumbnailPositions.size) {
+                    val position = thumbnailPositions[index]
+                    
+                    // Create source rectangle for entire bitmap
+                    sourceRectF.set(0f, 0f, it.width.toFloat(), it.height.toFloat())
+                    
+                    // Draw thumbnail with proper scaling from source to destination
+                    canvas.drawBitmap(it, sourceRectF, position, imagePaint)
+                    
+                    // Draw border around thumbnail
+                    canvas.drawRect(position, thumbnailBorderPaint)
+                }
+            }
+        }
+    }
+    
+    /**
+     * Draw viewport indicator rectangle
+     */
+    private fun drawViewportIndicator(canvas: Canvas) {
+        if (thumbnailPositions.isEmpty() || collageWidth <= 0 || collageHeight <= 0) return
+        
+        // Calculate viewport position relative to collage
+        val relativeLeft = viewportBounds.left / collageWidth
+        val relativeTop = viewportBounds.top / collageHeight
+        val relativeRight = viewportBounds.right / collageWidth
+        val relativeBottom = viewportBounds.bottom / collageHeight
+        
+        // Map to thumbnail coordinate space
+        val thumbnailArea = getThumbnailArea()
+        val indicatorLeft = thumbnailArea.left + (relativeLeft * thumbnailArea.width())
+        val indicatorTop = thumbnailArea.top + (relativeTop * thumbnailArea.height())
+        val indicatorRight = thumbnailArea.left + (relativeRight * thumbnailArea.width())
+        val indicatorBottom = thumbnailArea.top + (relativeBottom * thumbnailArea.height())
+        
+        // Draw viewport rectangle
+        tempRectF.set(indicatorLeft, indicatorTop, indicatorRight, indicatorBottom)
+        canvas.drawRect(tempRectF, viewportIndicatorPaint)
+    }
+    
+    /**
+     * Get total thumbnail area bounds
+     */
+    private fun getThumbnailArea(): RectF {
+        if (thumbnailPositions.isEmpty()) {
+            return RectF()
+        }
+        
+        val left = thumbnailPositions.minOfOrNull { it.left } ?: 0f
+        val top = thumbnailPositions.minOfOrNull { it.top } ?: 0f
+        val right = thumbnailPositions.maxOfOrNull { it.right } ?: width.toFloat()
+        val bottom = thumbnailPositions.maxOfOrNull { it.bottom } ?: height.toFloat()
+        
+        return RectF(left, top, right, bottom)
+    }
+    
+    /**
+     * Handle touch events for navigation
+     */
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN && thumbnailPositions.isNotEmpty()) {
+            val thumbnailArea = getThumbnailArea()
+            
+            if (thumbnailArea.contains(event.x, event.y)) {
+                // Calculate relative position within thumbnail area
+                val relativeX = (event.x - thumbnailArea.left) / thumbnailArea.width()
+                val relativeY = (event.y - thumbnailArea.top) / thumbnailArea.height()
+                
+                // Map to collage coordinates
+                val collageX = relativeX * collageWidth
+                val collageY = relativeY * collageHeight
+                
+                // Notify listener
+                onNavigationClickListener?.invoke(collageX, collageY)
+                return true
+            }
+        }
+        
+        return super.onTouchEvent(event)
+    }
+    
+    /**
+     * Clear all thumbnail data
+     */
+    private fun clearThumbnails() {
+        // Clear Glide targets
+        currentTargets.forEach { target ->
+            target?.let {
+                try {
+                    Glide.with(context.applicationContext).clear(it)
+                } catch (e: Exception) {
+                    // Context may be invalid, ignore
+                }
+            }
+        }
+        
+        // Clear data
+        photoUris.clear()
+        thumbnailBitmaps.clear()
+        thumbnailPositions.clear()
+        currentTargets.clear()
+        
+        collageWidth = 0f
+        collageHeight = 0f
+        isViewportVisible = false
+        
+        invalidate()
+    }
+    
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        clearThumbnails()
+    }
+}

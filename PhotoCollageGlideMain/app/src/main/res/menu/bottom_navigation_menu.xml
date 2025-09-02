@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/nav_grid"
+        android:title="Grid"
+        android:icon="@drawable/ic_grid_view" />
+    
+    <item
+        android:id="@+id/nav_single"
+        android:title="Single"
+        android:icon="@drawable/ic_single_view" />
+    
+    <item
+        android:id="@+id/nav_albums"
+        android:title="Albums"
+        android:icon="@drawable/ic_albums" />
+    
+    <item
+        android:id="@+id/nav_all_photos"
+        android:title="All Photos"
+        android:icon="@drawable/ic_photos" />
+        
+</menu>

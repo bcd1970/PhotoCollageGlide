@@ -46,6 +46,25 @@ class SelectionManager private constructor() {
         _selectedPhotos.value = currentSelection
         updateSelectionMode()
     }
+
+    fun selectPhoto(photo: PhotoModel) {
+        val currentSelection = _selectedPhotos.value.toMutableSet()
+        if (!currentSelection.contains(photo.id)) {
+            currentSelection.add(photo.id)
+            _selectedPhotoModels[photo.id] = photo
+            _selectedPhotos.value = currentSelection
+            updateSelectionMode()
+        }
+    }
+
+    fun deselectPhoto(photoId: Long) {
+        val currentSelection = _selectedPhotos.value.toMutableSet()
+        if (currentSelection.remove(photoId)) {
+            _selectedPhotoModels.remove(photoId)
+            _selectedPhotos.value = currentSelection
+            updateSelectionMode()
+        }
+    }
     
     fun isPhotoSelected(photoId: Long): Boolean {
         return _selectedPhotos.value.contains(photoId)

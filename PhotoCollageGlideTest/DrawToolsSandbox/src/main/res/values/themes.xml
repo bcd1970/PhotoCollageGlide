@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.DrawSandbox" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Customize dark theme as needed -->
+    </style>
+</resources>
+
