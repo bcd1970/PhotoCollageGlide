@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+; Removes the context menu items added by add-copy-path-variants.reg
+
+; Files/folders (AllFilesystemObjects)
+[-HKEY_CURRENT_USER\Software\Classes\AllFilesystemObjects\shell\CopyPath_DoubleBackslashes]
+[-HKEY_CURRENT_USER\Software\Classes\AllFilesystemObjects\shell\CopyPath_ForwardSlashes]
+
+; Folder background (Directory\Background)
+[-HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\CopyPath_DoubleBackslashes]
+[-HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\CopyPath_ForwardSlashes]
+

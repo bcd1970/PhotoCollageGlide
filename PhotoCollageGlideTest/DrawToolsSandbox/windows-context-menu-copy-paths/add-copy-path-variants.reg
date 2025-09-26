@@ -1,0 +1,37 @@
+Windows Registry Editor Version 5.00
+
+; Adds context menu items to copy paths with
+; 1) double backslashes (\\) and
+; 2) forward slashes (/)
+; for files and folders (AllFilesystemObjects) and for folder background (current directory).
+; Scope: Current user (no admin required).
+
+; ================================
+; For files and folders selection
+; ================================
+[HKEY_CURRENT_USER\Software\Classes\AllFilesystemObjects\shell\CopyPath_DoubleBackslashes]
+"MUIVerb"="Copy path (double backslashes)"
+
+[HKEY_CURRENT_USER\Software\Classes\AllFilesystemObjects\shell\CopyPath_DoubleBackslashes\command]
+@="powershell.exe -WindowStyle Hidden -NoProfile -Command \"Set-Clipboard -Value (('%1').Replace('\\','\\\\'))\""
+
+[HKEY_CURRENT_USER\Software\Classes\AllFilesystemObjects\shell\CopyPath_ForwardSlashes]
+"MUIVerb"="Copy path (forward slashes)"
+
+[HKEY_CURRENT_USER\Software\Classes\AllFilesystemObjects\shell\CopyPath_ForwardSlashes\command]
+@="powershell.exe -WindowStyle Hidden -NoProfile -Command \"Set-Clipboard -Value (('%1').Replace('\\','/'))\""
+
+; =====================================
+; For folder background (current folder)
+; =====================================
+[HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\CopyPath_DoubleBackslashes]
+"MUIVerb"="Copy this folder path (double backslashes)"
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\CopyPath_DoubleBackslashes\command]
+@="powershell.exe -WindowStyle Hidden -NoProfile -Command \"Set-Clipboard -Value (('%V').Replace('\\','\\\\'))\""
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\CopyPath_ForwardSlashes]
+"MUIVerb"="Copy this folder path (forward slashes)"
+
+[HKEY_CURRENT_USER\Software\Classes\Directory\Background\shell\CopyPath_ForwardSlashes\command]
+@="powershell.exe -WindowStyle Hidden -NoProfile -Command \"Set-Clipboard -Value (('%V').Replace('\\','/'))\""

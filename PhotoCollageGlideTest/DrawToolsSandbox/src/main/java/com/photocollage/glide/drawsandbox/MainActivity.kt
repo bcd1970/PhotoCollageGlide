@@ -9,7 +9,6 @@ import com.photocollage.glide.drawsandbox.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private var lockOn: Boolean = false
     companion object { private const val TAG = "DrawSmooth" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,36 +19,19 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Bottom bar: Shapes and Eraser
+        // Bottom bar: only Eraser
         binding.bottomBar.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.action_shapes -> {
-                    // Activate Shapes tool (rectangle with handles)
-                    binding.drawingSurface.setToolMode(DrawingSurfaceView.ToolMode.SHAPE)
-                    binding.drawingSurface.setShapeLockEnabled(lockOn)
-                    binding.shapeLockScroll.visibility = android.view.View.VISIBLE
-                    true
-                }
                 R.id.action_eraser -> {
                     binding.drawingSurface.clearAll()
-                    // Do not change selection; keep current tool highlighted
-                    false
+                    true
                 }
                 else -> true // no-op for now
             }
         }
 
-        // Initial state: focus on shapes
-        binding.bottomBar.selectedItemId = R.id.action_shapes
-        binding.drawingSurface.setToolMode(DrawingSurfaceView.ToolMode.SHAPE)
-        binding.drawingSurface.setShapeLockEnabled(lockOn)
-        binding.shapeLockScroll.visibility = android.view.View.VISIBLE
-
-        // Shape lock toggle group
-        binding.shapeLockGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
-            if (checkedId != R.id.shape_lock_toggle) return@addOnButtonCheckedListener
-            lockOn = isChecked
-            binding.drawingSurface.setShapeLockEnabled(lockOn)
-        }
+        // Initial state: select eraser
+        binding.bottomBar.selectedItemId = R.id.action_eraser
+        // Text tool removed in reset; no IME proxy wiring
     }
 }
