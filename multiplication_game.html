@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiplikations-Spielplatz</title>
+  <style>
+    :root {
+      color-scheme: light only;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', 'Trebuchet MS', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      color: #153a5b;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: -40vmax;
+      background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.35), transparent 55%),
+        radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.25), transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.3), transparent 60%);
+      animation: swirl 45s linear infinite;
+      z-index: 0;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    @keyframes swirl {
+      from {
+        transform: rotate(0deg) scale(1.1);
+      }
+      to {
+        transform: rotate(360deg) scale(1.1);
+      }
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.9));
+      border-radius: 1.75rem;
+      padding: clamp(2.5rem, 6vw, 3.5rem) clamp(2rem, 5vw, 3rem);
+      box-shadow: 0 25px 55px rgba(21, 58, 91, 0.25);
+      text-align: center;
+      width: min(90vw, 460px);
+      backdrop-filter: blur(6px);
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 5vw + 1rem, 3.6rem);
+      margin: 0 0 0.35rem;
+      letter-spacing: 0.04em;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: clamp(1rem, 2vw + 0.6rem, 1.2rem);
+      color: #5176a2;
+    }
+
+    .problem {
+      margin: clamp(1.5rem, 3vw, 2.2rem) 0 clamp(1.5rem, 3vw, 2.4rem);
+      font-size: clamp(3rem, 6vw + 1rem, 4rem);
+      font-weight: 700;
+      color: #ffffff;
+      background: linear-gradient(120deg, #ff9a9e, #fad0c4 45%, #ffd26f);
+      border-radius: 1.25rem;
+      padding: clamp(0.75rem, 2vw, 1.15rem);
+      box-shadow: inset 0 6px 12px rgba(255, 255, 255, 0.2), 0 15px 25px rgba(255, 154, 158, 0.35);
+      text-shadow: 0 6px 8px rgba(215, 100, 100, 0.3);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    input[type='number'] {
+      width: clamp(120px, 40%, 160px);
+      padding: clamp(0.75rem, 2vw, 1rem);
+      font-size: clamp(1.4rem, 2.5vw + 0.8rem, 1.8rem);
+      border: none;
+      border-radius: 1rem;
+      text-align: center;
+      color: #1b3b5a;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 25px rgba(81, 118, 162, 0.25);
+      outline: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type='number']:focus {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 18px 30px rgba(81, 118, 162, 0.3);
+    }
+
+    button {
+      border: none;
+      border-radius: 1rem;
+      padding: clamp(0.75rem, 2vw, 1rem) clamp(1.8rem, 5vw, 2.6rem);
+      font-size: clamp(1.2rem, 2.5vw + 0.6rem, 1.5rem);
+      font-weight: 600;
+      color: #ffffff;
+      background: linear-gradient(135deg, #6ee7b7, #3b82f6);
+      cursor: pointer;
+      box-shadow: 0 12px 25px rgba(59, 130, 246, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(59, 130, 246, 0.38);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: wait;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .feedback {
+      min-height: 3.5rem;
+      margin-top: clamp(1.1rem, 3vw, 1.7rem);
+      font-size: clamp(1.05rem, 2vw + 0.6rem, 1.3rem);
+      line-height: 1.4;
+      color: #5176a2;
+      transition: color 0.2s ease;
+    }
+
+    .feedback strong {
+      color: #245079;
+    }
+
+    .feedback--success {
+      color: #0f8a5f;
+    }
+
+    .feedback--hint {
+      color: #cf4f6b;
+    }
+
+    .feedback--prompt {
+      color: #5176a2;
+    }
+
+    .hint {
+      display: inline-block;
+      margin-top: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      color: #cf4f6b;
+      font-weight: 600;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @media (max-width: 480px) {
+      .input-row {
+        flex-direction: column;
+      }
+
+      input[type='number'] {
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+  <main>
+    <h1>Multiplikations-Spielplatz</h1>
+    <p class="subtitle">Löse die Aufgabe und feiere mit Konfetti!</p>
+    <div id="problem" class="problem">1 × 1 = ?</div>
+    <form id="answer-form" autocomplete="off">
+      <div class="input-row">
+        <input type="number" id="answer-input" inputmode="numeric" min="0" placeholder="Deine Antwort" aria-label="Schreibe die Antwort" required />
+        <button type="submit" id="check-button">Prüfen</button>
+      </div>
+    </form>
+    <div id="feedback" class="feedback feedback--prompt"></div>
+  </main>
+
+  <script>
+    (function () {
+      const problemEl = document.getElementById('problem');
+      const feedbackEl = document.getElementById('feedback');
+      const answerForm = document.getElementById('answer-form');
+      const answerInput = document.getElementById('answer-input');
+      const checkButton = document.getElementById('check-button');
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+
+      const successPhrases = ['Tolle Arbeit!', 'Du hast es geschafft!', 'Superstar!', 'Fantastisch!', 'Genialer Einfall!', 'Mathe-Magie!'];
+
+      const confetti = {
+        particles: [],
+        animationFrame: null,
+        duration: 2600,
+        colors: ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd', '#ff9ff3'],
+        gravity: 0.35
+      };
+
+      let currentProblem = null;
+      let celebrationTimer = null;
+      let lastAnswer = null;
+
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+      }
+
+      function createParticle() {
+        return {
+          x: Math.random() * window.innerWidth,
+          y: -Math.random() * window.innerHeight * 0.4,
+          size: 6 + Math.random() * 10,
+          color: confetti.colors[Math.floor(Math.random() * confetti.colors.length)],
+          vx: (Math.random() - 0.5) * 6,
+          vy: Math.random() * 4 + 2,
+          rotation: Math.random() * Math.PI * 2,
+          spin: (Math.random() - 0.5) * 0.3
+        };
+      }
+
+      function stopConfetti() {
+        if (confetti.animationFrame) {
+          cancelAnimationFrame(confetti.animationFrame);
+          confetti.animationFrame = null;
+        }
+        confetti.particles = [];
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      }
+
+      function startConfetti() {
+        stopConfetti();
+        const startTime = performance.now();
+        confetti.particles = Array.from({ length: 200 }, createParticle);
+
+        function draw(now) {
+          const elapsed = now - startTime;
+          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+          const fade = Math.max(0, 1 - elapsed / confetti.duration);
+          confetti.particles.forEach((particle) => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.vy += confetti.gravity * 0.2;
+            particle.rotation += particle.spin;
+
+            if (particle.y > window.innerHeight + 20) {
+              particle.y = -20;
+              particle.vy = Math.random() * 4 + 2;
+            }
+            if (particle.x > window.innerWidth + 20) {
+              particle.x = -20;
+            }
+            if (particle.x < -20) {
+              particle.x = window.innerWidth + 20;
+            }
+
+            ctx.save();
+            ctx.translate(particle.x, particle.y);
+            ctx.rotate(particle.rotation);
+            ctx.globalAlpha = fade;
+            ctx.fillStyle = particle.color;
+            ctx.fillRect(-particle.size / 2, -particle.size / 4, particle.size, particle.size * 0.6);
+            ctx.restore();
+          });
+
+          ctx.globalAlpha = 1;
+
+          if (elapsed < confetti.duration) {
+            confetti.animationFrame = requestAnimationFrame(draw);
+          } else {
+            stopConfetti();
+          }
+        }
+
+        confetti.animationFrame = requestAnimationFrame(draw);
+      }
+
+      function setFeedback(message, variant) {
+        feedbackEl.className = 'feedback ' + variant;
+        feedbackEl.innerHTML = message;
+      }
+
+      function skipCountHint(factor, times) {
+        const length = Math.min(times, 6);
+        const values = Array.from({ length }, (_, index) => factor * (index + 1));
+        const sequence = values.join(', ') + (times > 6 ? ', …' : '');
+        return sequence;
+      }
+
+      function newProblem() {
+        let a;
+        let b;
+        do {
+          a = randomInt(1, 10);
+          b = randomInt(1, 10);
+        } while (lastAnswer === a * b);
+
+        currentProblem = { a, b };
+        problemEl.textContent = a + ' × ' + b + ' = ?';
+        setFeedback('Gib deine Antwort ein und drücke Enter!', 'feedback--prompt');
+        answerInput.value = '';
+        answerInput.disabled = false;
+        checkButton.disabled = false;
+        answerInput.focus({ preventScroll: true });
+      }
+
+      answerForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (!currentProblem) {
+          return;
+        }
+
+        const raw = answerInput.value.trim();
+        if (raw === '') {
+          setFeedback('Gib eine Zahl ein, um zu prüfen, ob sie stimmt!', 'feedback--prompt');
+          answerInput.focus({ preventScroll: true });
+          return;
+        }
+
+        const guess = Number(raw);
+        if (!Number.isFinite(guess)) {
+          setFeedback('Hmm, das sieht nicht nach einer Zahl aus. Versuch es noch einmal!', 'feedback--hint');
+          answerInput.focus({ preventScroll: true });
+          return;
+        }
+
+        const product = currentProblem.a * currentProblem.b;
+
+        if (guess === product) {
+          lastAnswer = product;
+          const cheer = successPhrases[Math.floor(Math.random() * successPhrases.length)];
+          setFeedback('<strong>' + cheer + '</strong> ' + currentProblem.a + ' × ' + currentProblem.b + ' = ' + product + '!', 'feedback--success');
+          answerInput.disabled = true;
+          checkButton.disabled = true;
+          startConfetti();
+
+          if (celebrationTimer) {
+            clearTimeout(celebrationTimer);
+          }
+
+          celebrationTimer = setTimeout(function () {
+            stopConfetti();
+            newProblem();
+          }, 2200);
+        } else {
+          const direction = guess < product ? 'größeren' : 'kleineren';
+          const sequence = skipCountHint(currentProblem.a, currentProblem.b);
+          setFeedback(
+            'Fast geschafft! Versuch es mit einer etwas <strong>' +
+              direction +
+              '</strong> Zahl.<br><span class="hint">Hinweis: Zähle in ' +
+              currentProblem.a +
+              'er-Schritten → ' +
+              sequence +
+              '</span>',
+            'feedback--hint'
+          );
+          answerInput.focus({ preventScroll: true });
+          answerInput.select();
+        }
+      });
+
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+      newProblem();
+    })();
+  </script>
+</body>
+</html>
